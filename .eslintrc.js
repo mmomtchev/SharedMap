@@ -18,32 +18,5 @@ module.exports = {
     rules: {
         quotes: ['error', 'single'],
         semi: ['error', 'always']
-    },
-    overrides: [
-        {
-            files: ['igc-parser.js'],
-            rules: {
-                quotes: [0]
-            }
-        },
-        {
-            files: ['test.js'],
-            parserOptions: {
-                ecmaVersion: 2018
-            }
-        },
-        {
-            files: ['www/index.js'],
-            env: {
-                browser: true,
-                es6: true,
-                commonjs: false,
-                node: false
-            },
-            parserOptions: {
-                ecmaVersion: 2016,
-                sourceType: 'module'
-            },
-        }
-    ]
+    }
 };

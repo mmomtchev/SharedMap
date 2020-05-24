@@ -1,8 +1,9 @@
 {
   "name": "sharedmap",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Multithreading-compatible SharedMap in vanilla JS",
   "main": "index.js",
+  
   "scripts": {
     "test": "test"
   },
@@ -11,11 +12,11 @@
     "url": "git+https://github.com/mmomtchev/SharedMap.git"
   },
   "keywords": [
-    "shared",
+    "sharedmap",
     "multithreading",
     "worker",
-    "serviceworker",
-    "workerthreads",
+    "service-worker",
+    "worker-threads",
     "SharedArrayBuffer"
   ],
   "author": "Momtchil Momtchev <momtchil@momtchev.com>",
