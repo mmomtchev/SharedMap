@@ -29,7 +29,7 @@ Because of the severe limitations that **SharedArrayBuffer** imposes, **SharedMa
 The HashMap is a coalesced HashMap and has almost no performance drop up to 95% fill ratio and it is still usable up to 99.99%.
 This chart shows the performance drop for a SharedMap with 370k English words and 4:8:1 ratio of set/get/delete operations:
 
-![Performance Chart](https://gist.github.com/mmomtchev/01f50eedac8d2a61346a9a0f373c24e4#file-performance-png)
+![Performance Chart](https://gist.githubusercontent.com/mmomtchev/01f50eedac8d2a61346a9a0f373c24e4/raw/b49d0130e16c24137b56efa87540c84544b1630f/performance.png)
 
 The default hash function is MurmurHash2 which works very well for words. You can provide your own hash function by override the *hash* property.
 
