@@ -231,9 +231,9 @@ class SharedMap {
         if (typeof value !== 'string')
             throw new TypeError('SharedMap can contain only strings and numbers which will be converted to strings');
         if (key.length > this.meta[META.keySize] << 1)
-            throw new RangeError(`SharedMap key ${key} does not fit in ${this.meta[META.keySize] << 2} bytes, ${this.meta[META.keySize] << 1} UTF-16 code points`);
-        if (value.length > this.meta[META.objSize] << 2)
-            throw new RangeError(`SharedMap value ${value} does not fit in ${this.meta[META.objSize] << 2} bytes, ${this.meta[META.objSize] << 1} UTF-16 code points`);
+            throw new RangeError(`SharedMap key ${key} does not fit in ${this.meta[META.keySize] << 1} bytes, ${this.meta[META.keySize] << 1} UTF-16 code points`);
+        if (value.length > this.meta[META.objSize] << 1)
+            throw new RangeError(`SharedMap value ${value} does not fit in ${this.meta[META.objSize] << 1} bytes, ${this.meta[META.objSize] << 1} UTF-16 code points`);
 
         this.stats.set++;
         this.lockMapExclusive();
