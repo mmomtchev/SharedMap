@@ -41,7 +41,7 @@ It supports single line locking with deadlock recovery at the moment. Unless a d
 ## Installation
 
 ```bash
-npm install SharedMap
+npm install sharedmap
 ```
 
 ## Usage
