@@ -1,3 +1,4 @@
+'use strict';
 /* zero-dependency
  * Vanilla JS Implementation of SharedMap,
  * a synchronous multi-threading capable,
@@ -13,6 +14,7 @@
  * @see http://github.com/mmomtchev/SharedMap
  */
 
+const UINT32_MAX = 0xFFFFFFFF;
 const UINT32_UNDEFINED = 0xFFFFFFFF;
 /* This is MurmurHash2 */
 function _hash(str) {
@@ -114,8 +116,8 @@ class SharedMap {
         return this.meta[META.maxSize];
     }
 
+    /* eslint-disable no-constant-condition */
     _lock(l) {
-        /* eslint-disable no-constant-condition */
         while (true) {
             let state;
             state = Atomics.exchange(this.maplock, l, 1);
@@ -123,7 +125,6 @@ class SharedMap {
                 return;
             Atomics.wait(this.maplock, l, state);
         }
-        /* eslint-enable no-constant-condition */
     }
 
     _unlock(l) {
@@ -143,10 +144,11 @@ class SharedMap {
             Atomics.wait(this.linelocks, index, state);
         }
     }
+    /* eslint-enable no-constant-condition */
 
     unlockLine(pos) {
         const bitmask = 1 << (pos % 32);
-        const notbitmask = (~bitmask) & 0xFFFFFFFF;
+        const notbitmask = (~bitmask) & UINT32_MAX;
         const index = Math.floor(pos / 32);
         const state = Atomics.and(this.linelocks, index, notbitmask);
         if ((state & bitmask) == 0)
@@ -154,24 +156,12 @@ class SharedMap {
         Atomics.notify(this.linelocks, index);
     }
 
-    /*unlockLines(locks) {
-        for (let l of locks)
-            this.unlockLine(l);
-    }*/
-
     lockLineSliding(oldLock, newLock) {
         if (newLock <= oldLock)
             throw new Deadlock();
         this.lockLine(newLock);
         this.unlockLine(oldLock);
         return newLock;
-    }
-
-    assertLocked(pos) {
-        const bitmask = 1 << (pos % 32);
-        const index = Math.floor(pos / 32);
-        if (this.linelocks[index] && bitmask === 0)
-            throw 'Not locked';
     }
 
     lockMapExclusive() {
@@ -265,7 +255,7 @@ class SharedMap {
                     exclusive || (slidingLock = this.lockLineSliding(slidingLock, pos));
                 }
             }
-            if (this.meta[META.length] === this.meta[META.maxSize])
+            if (Atomics.load(this.meta, META.length) === this.meta[META.maxSize])
                 throw new RangeError('SharedMap is full');
             /* Copy the element into place, chaining when needed */
             let i;
@@ -418,7 +408,7 @@ class SharedMap {
         this.keysData[pos * this.meta[META.keySize]] = 0;
         if (previous !== UINT32_UNDEFINED)
             this.chaining[previous] = UINT32_UNDEFINED;
-        this.meta[META.length]--;
+        Atomics.sub(this.meta, META.length, 1);
         if (next === UINT32_UNDEFINED) {
             /* There was no further chaining, just delete this element */
             /* and unchain it from the previous */
@@ -435,7 +425,7 @@ class SharedMap {
         while (el !== UINT32_UNDEFINED) {
             chain.push({ key: this._decodeKey(el), value: this._decodeValue(el) });
             this.keysData[el * this.meta[META.keySize]] = 0;
-            this.meta[META.length]--;
+            Atomics.sub(this.meta, META.length, 1);
             el = this.chaining[el];
         }
         for (el of chain) {
@@ -464,7 +454,7 @@ class SharedMap {
         this.lockMapExclusive();
         this.keysData.fill(0);
         this.valuesData.fill(0);
-        this.meta[META.length] = 0;
+        Atomics.store(this.meta, META.length, 0);
         this.unlockMapExclusive();
     }
 }

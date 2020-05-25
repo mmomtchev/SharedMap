@@ -65,7 +65,7 @@ if (workerThreads.isMainThread) {
         myMap.delete('nonexisting');
         throw new Error('delete nonexisting succeeded');
     } catch (e) {
-        if (!e instanceof RangeError)
+        if (!(e instanceof RangeError))
             throw e;
     }
     const workers = new Array(NWORKERS).fill(undefined);

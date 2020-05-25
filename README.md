@@ -36,7 +36,7 @@ The default hash function is MurmurHash2 which works very well for words. You ca
 
 It supports deleting and will rechain itself when needed. The rechaining can be quite small and can be further optimized.
 
-It supports single line locking with deadlock recovery at the moment. Unless a deadlock is detected, *get* and *set* require only a shared global lock and lock exclusively no more than two lines and so multiple operations can run in parallel. *delete* requires an exclusive lock and it is slow.
+It supports single line locking with deadlock recovery at the moment. Unless a deadlock is detected, *get* and *set* require only a shared global lock and lock exclusively no more than two lines so multiple operations can run in parallel. *delete* requires an exclusive lock and it is slow.
 
 ## Installation
 
