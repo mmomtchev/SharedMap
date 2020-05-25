@@ -305,7 +305,7 @@ class SharedMap {
         this.lockMapExclusive();
         const find = this._find(key);
         if (find === undefined) {
-            this.unlockMap();
+            this.unlockMapExclusive();
             throw RangeError(`SharedMap does not contain key ${key}`);
         }
         this.stats.delete++;
