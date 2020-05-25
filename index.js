@@ -266,7 +266,7 @@ class SharedMap {
         this.lockMapShared();
         const pos = this._find(key);
         if (pos === undefined) {
-            this.unlockMap();
+            this.unlockMapShared();
             return undefined;
         }
         const v = this._decodeValue(pos.pos);
