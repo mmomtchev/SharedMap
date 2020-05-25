@@ -60,12 +60,41 @@ if (workerThreads.isMainThread) {
     myMap.set('test', 1);
     console.assert(myMap.get('test') === '1');
     myMap.clear();
-    console.assert(!myMap.has('test') && myMap.length === 0);
+    console.assert(!myMap.has('test') && myMap.length === 0 && myMap.get('test') === undefined);
+    try {
+        myMap.delete('nonexisting');
+        throw new Error('delete nonexisting succeeded');
+    } catch (e) {
+        if (!e instanceof RangeError)
+            throw e;
+    }
     const workers = new Array(NWORKERS).fill(undefined);
     for (let w in workers) {
         workers[w] = new workerThreads.Worker('./test.js', { workerData: { map: myMap, part: w, parts: NWORKERS } });
         workers[w].on('message', (m) => console.log(m));
-        workers[w].on('exit', () => console.log(`worker ${w} finished`));
+        workers[w].on('error', (e) => { console.log(e); myMap.__printMap(); });
+        workers[w].on('exit', () => {
+            console.log(`worker ${w} finished`);
+            workers[w].finished = true;
+            if (workers.reduce((a, x) => a && x.finished, true)) {
+                let newMap = {};
+                for (let k of myMap.keys()) {
+                    if (newMap['xx' + k] !== undefined) {
+                        console.log(k, newMap['xx' + k], myMap.get(k));
+                        myMap.__printMap();
+                        throw k;
+                    }
+                    newMap['xx' + k] = myMap.get(k);
+                }
+                console.log('all finished, checking consistency');
+                const wordsDeleted = Math.ceil(Math.ceil(words.length / 4) / NWORKERS) * NWORKERS;
+                if (myMap.length !== words.length - wordsDeleted)
+                    throw new Error('wrong amount of values ' + myMap.length + ' should be ' + (words.length - wordsDeleted));
+                for (let k of myMap.keys())
+                    if (myMap.get(k) === undefined)
+                        throw new Error('missing values');
+            }
+        });
     }
 } else {
     const myMap = workerThreads.workerData.map;
