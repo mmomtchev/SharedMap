@@ -1,6 +1,6 @@
 {
   "name": "sharedmap",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Multithreading-compatible SharedMap in vanilla JS",
   "main": "index.js",
   
