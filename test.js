@@ -68,6 +68,20 @@ if (workerThreads.isMainThread) {
         if (!(e instanceof RangeError))
             throw e;
     }
+    try {
+        myMap.set('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'b');
+        throw new Error('insert oversized key');
+    } catch (e) {
+        if (!(e instanceof RangeError))
+            throw e;
+    }
+    try {
+        myMap.set('b', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+        throw new Error('insert oversized value');
+    } catch (e) {
+        if (!(e instanceof RangeError))
+            throw e;
+    }
     const workers = new Array(NWORKERS).fill(undefined);
     for (let w in workers) {
         workers[w] = new workerThreads.Worker('./test.js', { workerData: { map: myMap, part: w, parts: NWORKERS } });
