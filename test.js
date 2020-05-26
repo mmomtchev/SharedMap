@@ -24,6 +24,11 @@ function testMap(map, mypart, parts, out) {
             if (+v != i)
                 throw new Error(`value mismatch ${words[i]} ${i} != ${+v}`);
         }
+        for (let i = mypart; i < words.length; i++) {
+            const v = map.get(words[i]);
+            if (v !== undefined && +v != i)
+                throw new Error(`value mismatch ${words[i]} ${i} != ${+v}`);
+        }
         out(`t: ${mypart} ${map.length}/${map.size} elements in map`);
 
         for (let i = mypart; i < words.length; i += 4 * parts) {
