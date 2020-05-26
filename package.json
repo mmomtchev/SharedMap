@@ -1,12 +1,13 @@
 {
   "name": "sharedmap",
-  "version": "0.0.99",
+  "version": "1.0.0",
   "description": "Multithreading-compatible SharedMap in vanilla JS",
   "main": "index.js",
   "scripts": {
     "test": "node test",
-    "preversion": "npm test && eslint *.js",
-    "version": "git add package.json",
+    "preversion": "npm test && eslint index.js test.js",
+    "minify": "terser index.js -o index.min.js",
+    "version": "npm run minify && git add package.json index.min.js",
     "postversion": "git push && git push --tags"
   },
   "repository": {
