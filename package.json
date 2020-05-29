@@ -7,8 +7,8 @@
     "test": "node test",
     "preversion": "npm test && eslint index.js test.js",
     "minify": "terser index.js -o index.min.js",
-    "doc": "jsdoc index.js README.md -d doc",
-    "version": "npm run minify && npm run doc && git add package.json index.min.js doc",
+    "doc": "jsdoc index.js README.md -d docs",
+    "version": "npm run minify && npm run doc && git add package.json index.min.js docs",
     "postversion": "git push && git push --tags"
   },
   "repository": {
