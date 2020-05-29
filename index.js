@@ -194,6 +194,7 @@ class SharedMap {
      * Acquire an exclusive lock
      * All operations that need it, automatically acquire it
      * Use only if you need to block all other threads from accessing the map
+     * @private
      * @return {void}
      */
     lockExclusive() {
@@ -202,6 +203,7 @@ class SharedMap {
 
     /**
      * Release the exclusive lock
+     * @private
      * @return {void}
      */
     unlockExclusive() {
@@ -242,6 +244,7 @@ class SharedMap {
      * Acquire a write lock
      * All operations that need it, automatically acquire it
      * Use only if you need to block all other threads from writing to the map
+     * map.lockWrite(); map.set(a, b); will currently fail!
      * @example map.lockWrite(); sum = map.reduce((a, x) => a += (+x), 0); map.unlockWrite();
      * @return {void}
      */
