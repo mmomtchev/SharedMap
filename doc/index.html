@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>SharedMap</h1>
+<ul>
+<li><em><strong>zero-dependency</strong></em></li>
+<li>Vanilla JS Implementation of SharedMap,</li>
+<li>a synchronous multi-threading capable,</li>
+<li>fine-grained locked with deadlock recovery,</li>
+<li>static memory allocated,</li>
+<li>coalesced-chaining HashMap,</li>
+<li>backed by <strong>SharedArrayBuffer</strong></li>
+<li>that supports deleting</li>
+<li>and is capable of auto-defragmenting itself on delete unless almost full</li>
+</ul>
+<h2>Introduction</h2>
+<p>Due to its legacy as a simple Web page glue, JS has what is probably the absolutely worst support of multi-threading among all languages created in the last few decades.</p>
+<p>As the language matures, driven by a remarkably well implemented engine (V8) and the unique promise of unifying back-end, front-end and desktop application development, real multi-threading for CPU-bound tasks is becoming an absolute necessity.
+In a true JS spirit, a feature after feature is added, some projects implementing it, others boycotting it, leaving it to the crowd to eventually decide what is worth supporting and what is not. As much as this can appear appalling to computer language experts, it is in a quite a way reminiscent of how the Linux kernel imposted itself vs the tech giants 20 years ago, and this is how JS is today on its way to total dominance for the years to come.</p>
+<p>The current situation with <strong>SharedArrayBuffer</strong> is a perfect example of this JS spirit. In the hope that at some point in the near future Firefox will re-enable it by default, and Safari will implement it, <strong>SharedMap</strong> is proposed as a working solution for computationally-heavy back-end programs executing in Node.js.</p>
+<p><strong>SharedMap</strong> is browser-compatible in theory, but on the front-end side, when one of the major browsers is completely missing (<em>Safari</em>), and another one requires the user to go through a security warning to enable an obscure feature (<em>Firefox</em>), its usefulness will be severely limited. For this reason I haven't even bothered to include an ES Modules interface.</p>
+<p><strong>SharedMap</strong> was motivated by <a href="https://github.com/mmomtchev/igc-xc-score">igc-xc-score</a>, a linear optimization solver for scoring paragliding flights. When I started it, I initially tried Python because of its flawless multi-threading and then I slowly realized that the single-threaded V8 implementation was faster then the 4-way multi-threaded Python3 (and PyPy) implementation. Love it or hate it, JS is here to stay for the years to come.</p>
+<h2>About</h2>
+<p>Because of the severe limitations that <strong>SharedArrayBuffer</strong> imposes, <strong>SharedMap</strong> supports only numbers and strings and uses fixed memory allocation. It uses synchronous locking, implemented on top of the <strong>Atomics</strong> interface.</p>
+<p>The HashMap is a coalesced HashMap and has almost no performance drop up to 95% fill ratio and it is still usable up to 99.99%.
+This chart shows the performance drop for a SharedMap with 370k English words and 4:8:1 ratio of <em>set/get/delete</em> operations:</p>
+<p><img src="https://gist.githubusercontent.com/mmomtchev/01f50eedac8d2a61346a9a0f373c24e4/raw/b49d0130e16c24137b56efa87540c84544b1630f/performance.png" alt="Performance Chart"></p>
+<p>The default hash function is MurmurHash2 which works very well for words. You can provide your own hash function by override the <em>hash</em> property.</p>
+<p>It supports deleting and will rechain itself when needed. The rechaining can be quite small and can be further optimized.</p>
+<p>It supports single-line locking with deadlock recovery. Unless a deadlock is detected, <em>get</em> and <em>set</em> require only a shared global lock and lock exclusively no more than two lines so multiple operations can run in parallel. <em>delete</em> requires an exclusive lock and it is slow.</p>
+<h2>Installation</h2>
+<pre class="prettyprint source lang-bash"><code>npm install sharedmap
+</code></pre>
+<h2>Usage</h2>
+<pre class="prettyprint source lang-js"><code>const SharedMap = require('SharedMap');
+
+const MAPSIZE = 128 * 1024 * 1024;
+const KEYSIZE = 48;                 // Do not forget that JS uses UTF-16 encoding
+const OBJSIZE = 16;
+const NWORKERS = require('os').cpus().length;
+
+if (workerThreads.isMainThread) {
+    const myMap = new SharedMap(MAPSIZE, KEYSIZE, OBJSIZE);
+    workers = new Array(NWORKERS).fill(undefined);
+    for (let w in workers) {
+        workers[w] = new workerThreads.Worker('./test.js', { workerData: { map: myMap } });
+    }
+} else {
+    const myMap = workerThreads.workerData.map;     // You can also send it through a MessagePort
+    myMap.__proto__ = SharedMap.prototype;          // You have to manually restore the prototype
+
+    myMap.set('prop1', 'val1');
+    myMap.set('prop2', 12);
+    console.assert(myMap.get('prop1') == 'val1');
+    console.assert(myMap.get('prop2') == '12');     // Numbers will be converted to strings
+    myMap.set('prop3', JSON.Stringify('a'));        // You can store objects if you serialize them
+    myMap.delete('prop2');
+    console.assert(myMap.hash('prop2') == false);
+    console.assert(myMap.length === 1);
+    for (let k of myMap.keys())                     // SharedMap.keys() is a generator
+        console.assert(myMap.has(k));
+    const allKeys = Array.from(myMap.keys());
+    myMap.clear();
+}
+</code></pre>
+<h2>TODO and contributing</h2>
+<ul>
+<li>Avoid unncessary copying when rechaining on delete</li>
+</ul>
+<p>Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.</p>
+<p>Please make sure to update tests as appropriate.</p>
+<h2>License</h2>
+<p><a href="https://choosealicense.com/licenses/lgpl-3.0/">LGPL</a></p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="SharedMap.html">SharedMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 29 2020 11:45:55 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

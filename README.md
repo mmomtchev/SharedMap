@@ -1,14 +1,15 @@
 # SharedMap
 
  * ***zero-dependency***
- * Vanilla JS Implementation of SharedMap,
+ * Vanilla JS implementation of SharedMap,
  * a synchronous multi-threading capable,
- * fine-grained locked with deadlock recovery,
+ * fine-grain-locked with deadlock recovery,
  * static memory allocated,
  * coalesced-chaining HashMap,
  * backed by **SharedArrayBuffer**
  * that supports deleting
  * and is capable of auto-defragmenting itself on delete unless almost full
+ * compatible with both Node.js and SharedArrayBuffer-enabled browsers
 
 ## Introduction
 
@@ -76,7 +77,6 @@ if (workerThreads.isMainThread) {
     const allKeys = Array.from(myMap.keys());
     myMap.clear();
 }
-
 ```
 
 ## TODO and contributing

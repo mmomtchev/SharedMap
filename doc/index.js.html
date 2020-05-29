@@ -1,4 +1,32 @@
-'use strict';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: index.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: index.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
 const UINT32_MAX = 0xFFFFFFFF;
 const UINT32_UNDEFINED = 0xFFFFFFFF;
 
@@ -16,33 +44,33 @@ function _hash(str) {
         k;
     while (l >= 4) {
         k =
-            ((str.charCodeAt(i) & 0xff)) |
-            ((str.charCodeAt(++i) & 0xff) << 8) |
-            ((str.charCodeAt(++i) & 0xff) << 16) |
-            ((str.charCodeAt(++i) & 0xff) << 14);
-        k = (((k & 0xffff) * 0x5bd1e995) + ((((k >>> 16) * 0x5bd1e995) & 0xffff) << 16));
+            ((str.charCodeAt(i) &amp; 0xff)) |
+            ((str.charCodeAt(++i) &amp; 0xff) &lt;&lt; 8) |
+            ((str.charCodeAt(++i) &amp; 0xff) &lt;&lt; 16) |
+            ((str.charCodeAt(++i) &amp; 0xff) &lt;&lt; 14);
+        k = (((k &amp; 0xffff) * 0x5bd1e995) + ((((k >>> 16) * 0x5bd1e995) &amp; 0xffff) &lt;&lt; 16));
         k ^= k >>> 14;
-        k = (((k & 0xffff) * 0x5bd1e995) + ((((k >>> 16) * 0x5bd1e995) & 0xffff) << 16));
-        h = (((h & 0xffff) * 0x5bd1e995) + ((((h >>> 16) * 0x5bd1e995) & 0xffff) << 16)) ^ k;
+        k = (((k &amp; 0xffff) * 0x5bd1e995) + ((((k >>> 16) * 0x5bd1e995) &amp; 0xffff) &lt;&lt; 16));
+        h = (((h &amp; 0xffff) * 0x5bd1e995) + ((((h >>> 16) * 0x5bd1e995) &amp; 0xffff) &lt;&lt; 16)) ^ k;
         l -= 4;
         ++i;
     }
     /* eslint-disable no-fallthrough */
     switch (l) {
-        case 3: h ^= (str.charCodeAt(i + 2) & 0xff) << 16;
-        case 2: h ^= (str.charCodeAt(i + 1) & 0xff) << 8;
-        case 1: h ^= (str.charCodeAt(i) & 0xff);
-            h = (((h & 0xffff) * 0x5bd1e995) + ((((h >>> 16) * 0x5bd1e995) & 0xffff) << 16));
+        case 3: h ^= (str.charCodeAt(i + 2) &amp; 0xff) &lt;&lt; 16;
+        case 2: h ^= (str.charCodeAt(i + 1) &amp; 0xff) &lt;&lt; 8;
+        case 1: h ^= (str.charCodeAt(i) &amp; 0xff);
+            h = (((h &amp; 0xffff) * 0x5bd1e995) + ((((h >>> 16) * 0x5bd1e995) &amp; 0xffff) &lt;&lt; 16));
     }
     /* eslint-enable no-fallthrough */
     h ^= h >>> 13;
-    h = (((h & 0xffff) * 0x5bd1e995) + ((((h >>> 16) * 0x5bd1e995) & 0xffff) << 16));
+    h = (((h &amp; 0xffff) * 0x5bd1e995) + ((((h >>> 16) * 0x5bd1e995) &amp; 0xffff) &lt;&lt; 16));
     h ^= h >>> 15;
     return h >>> 0;
 }
 
 function align32(v) {
-    return (v & 0xFFFFFFFFFFFFC) + ((v & 0x3) ? 0x4 : 0);
+    return (v &amp; 0xFFFFFFFFFFFFC) + ((v &amp; 0x3) ? 0x4 : 0);
 }
 
 const META = {
@@ -77,7 +105,7 @@ class Deadlock extends Error {
  * that supports deleting
  * and is capable of auto-defragmenting itself on delete unless almost full
  * compatible with both Node.js and SharedArrayBuffer-enabled browsers
- * @author Momtchil Momtchev <momtchil@momtchev.com>
+ * @author Momtchil Momtchev &lt;momtchil@momtchev.com>
  * @see http://github.com/mmomtchev/SharedMap
  */
 class SharedMap {
@@ -93,7 +121,7 @@ class SharedMap {
         keySize = align32(keySize);
         objSize = align32(objSize);
 
-        if (!(maxSize > 0 && keySize > 0 && objSize > 0))
+        if (!(maxSize > 0 &amp;&amp; keySize > 0 &amp;&amp; objSize > 0))
             throw new RangeError('maxSize, keySize and objSize must be positive numbers');
         this.storage = new SharedArrayBuffer(
             Object.keys(META).length * Uint32Array.BYTES_PER_ELEMENT
@@ -157,11 +185,11 @@ class SharedMap {
     }
 
     lockLine(pos) {
-        const bitmask = 1 << (pos % 32);
+        const bitmask = 1 &lt;&lt; (pos % 32);
         const index = Math.floor(pos / 32);
         while (true) {
             const state = Atomics.or(this.linelocks, index, bitmask);
-            if ((state & bitmask) == 0)
+            if ((state &amp; bitmask) == 0)
                 return pos;
             Atomics.wait(this.linelocks, index, state);
         }
@@ -169,17 +197,17 @@ class SharedMap {
     /* eslint-enable no-constant-condition */
 
     unlockLine(pos) {
-        const bitmask = 1 << (pos % 32);
-        const notbitmask = (~bitmask) & UINT32_MAX;
+        const bitmask = 1 &lt;&lt; (pos % 32);
+        const notbitmask = (~bitmask) &amp; UINT32_MAX;
         const index = Math.floor(pos / 32);
         const state = Atomics.and(this.linelocks, index, notbitmask);
-        if ((state & bitmask) == 0)
+        if ((state &amp; bitmask) == 0)
             throw new Error('linelock desync ' + pos);
         Atomics.notify(this.linelocks, index);
     }
 
     lockLineSliding(oldLock, newLock) {
-        if (newLock <= oldLock)
+        if (newLock &lt;= oldLock)
             throw new Deadlock();
         this.lockLine(newLock);
         this.unlockLine(oldLock);
@@ -210,21 +238,21 @@ class SharedMap {
 
     _match(key, pos) {
         let i;
-        for (i = 0; i < key.length; i++)
+        for (i = 0; i &lt; key.length; i++)
             if (this.keysData[pos * this.meta[META.keySize] + i] !== key.charCodeAt(i))
                 break;
-        return i === key.length && this.keysData[pos * this.meta[META.keySize] + i] === 0;
+        return i === key.length &amp;&amp; this.keysData[pos * this.meta[META.keySize] + i] === 0;
     }
 
     _decodeValue(pos) {
         const eos = this.valuesData.subarray(pos * this.meta[META.objSize], (pos + 1) * this.meta[META.objSize]).findIndex(x => x === 0);
-        const end = eos < 0 ? (pos + 1) * this.meta[META.objSize] : pos * this.meta[META.objSize] + eos;
+        const end = eos &lt; 0 ? (pos + 1) * this.meta[META.objSize] : pos * this.meta[META.objSize] + eos;
         return String.fromCharCode.apply(null, this.valuesData.subarray(pos * this.meta[META.objSize], end));
     }
 
     _decodeKey(pos) {
         const eos = this.keysData.subarray(pos * this.meta[META.keySize], (pos + 1) * this.meta[META.keySize]).findIndex(x => x === 0);
-        const end = eos < 0 ? (pos + 1) * this.meta[META.keySize] : pos * this.meta[META.keySize] + eos;
+        const end = eos &lt; 0 ? (pos + 1) * this.meta[META.keySize] : pos * this.meta[META.keySize] + eos;
         return String.fromCharCode.apply(null, this.keysData.subarray(pos * this.meta[META.keySize], end));
     }
 
@@ -235,10 +263,10 @@ class SharedMap {
             + ` key: ${this._decodeKey(pos)}`
             + ` value: ${this._decodeValue(pos)}`
             + ` chain: ${this.chaining[pos]}`
-            + ((n > 0 && this.chaining[pos] !== UINT32_UNDEFINED) ? '\n' + (this._decodeBucket(this.chaining[pos], n - 1)) : '');
+            + ((n > 0 &amp;&amp; this.chaining[pos] !== UINT32_UNDEFINED) ? '\n' + (this._decodeBucket(this.chaining[pos], n - 1)) : '');
     }
     __printMap() {
-        for (let i = 0; i < this.meta[META.maxSize]; i++)
+        for (let i = 0; i &lt; this.meta[META.maxSize]; i++)
             console.log(this._decodeBucket(i, 0));
         process.exit(1);
     }
@@ -255,7 +283,7 @@ class SharedMap {
                 this.stats.collisions++;
                 /* Replacing existing key */
                 if (this._match(key, pos)) {
-                    for (let i = 0; i < value.length; i++)
+                    for (let i = 0; i &lt; value.length; i++)
                         this.valuesData[pos * this.meta[META.objSize] + i] = value.charCodeAt(i);
                     exclusive || this.unlockLine(slidingLock);
                     return;
@@ -281,10 +309,10 @@ class SharedMap {
                 throw new RangeError('SharedMap is full');
             /* Copy the element into place, chaining when needed */
             let i;
-            for (i = 0; i < key.length; i++)
+            for (i = 0; i &lt; key.length; i++)
                 this.keysData[pos * this.meta[META.keySize] + i] = key.charCodeAt(i);
             this.keysData[pos * this.meta[META.keySize] + i] = 0;
-            for (i = 0; i < value.length; i++)
+            for (i = 0; i &lt; value.length; i++)
                 this.valuesData[pos * this.meta[META.objSize] + i] = value.charCodeAt(i);
             this.valuesData[pos * this.meta[META.objSize] + i] = 0;
             this.chaining[pos] = UINT32_UNDEFINED;
@@ -358,13 +386,13 @@ class SharedMap {
             this.stats.get++;
             exclusive || (slidingLock = this.lockLine(pos));
             /* Loop through the bucket chaining */
-            while (pos !== UINT32_UNDEFINED && this.keysData[pos * this.meta[META.keySize]] !== 0) {
+            while (pos !== UINT32_UNDEFINED &amp;&amp; this.keysData[pos * this.meta[META.keySize]] !== 0) {
                 if (this._match(key, pos)) {
                     return { pos, previous };
                 }
                 previous = pos;
                 pos = this.chaining[pos];
-                if (pos !== UINT32_UNDEFINED && !exclusive)
+                if (pos !== UINT32_UNDEFINED &amp;&amp; !exclusive)
                     slidingLock = this.lockLineSliding(slidingLock, pos);
             }
             exclusive || this.unlockLine(slidingLock);
@@ -487,7 +515,7 @@ class SharedMap {
      * @return {Iterable}
      */
     *keys() {
-        for (let pos = 0; pos < this.meta[META.maxSize]; pos++) {
+        for (let pos = 0; pos &lt; this.meta[META.maxSize]; pos++) {
             this.lockMapShared();
             this.lockLine(pos);
             if (this.keysData[pos * this.meta[META.keySize]] !== 0) {
@@ -515,4 +543,26 @@ class SharedMap {
     }
 }
 
-module.exports = SharedMap;
+module.exports = SharedMap;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="SharedMap.html">SharedMap</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 29 2020 11:45:55 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
