@@ -40,7 +40,7 @@ It supports deleting and will rechain itself when needed. The rechaining can be 
 
 It supports single-line locking with deadlock recovery. Unless a deadlock is detected, *get* and *set* require only a shared global lock and lock exclusively no more than two lines so multiple operations can run in parallel. *delete* requires an exclusive lock and it is slow.
 
-There are also thread-safe implementations of map() and reduce() and a public method allowing a program to temporarily lock out writers.
+There are also thread-safe implementations of *map()* and *reduce()* and a public method allowing a program to temporarily lock out writers.
 
 ## Installation
 
@@ -84,7 +84,7 @@ if (workerThreads.isMainThread) {
 
     myMap.lockWrite();
     for (let k of myMap.keys())
-        console.assert(myMap.has(k));               // will never fail
+        console.assert(myMap.has(k));               // will never fail, but locks out writers
     myMap.unlockWrite();
 
     const sum = map.reduce((a, x) => a += (+x), 0); // Both are thread-safe without lock, but there could 
@@ -92,7 +92,7 @@ if (workerThreads.isMainThread) {
 
     // get & has in the callback are allowed, set & delete are not
     // map.get(key)=currentValue is guaranteed while the callback runs
-    const sumMul = map.reduce((a, x, i) => a += (+map.get(i)), 0); 
+    const sum2 = map.reduce((a, x, i) => a += (+map.get(i)), 0); 
 
     myMap.clear();
 }

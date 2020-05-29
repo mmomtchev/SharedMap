@@ -583,9 +583,15 @@ class SharedMap {
         for (let pos of this._keys()) {
             const k = this._decodeKey(pos);
             const v = this._decodeValue(pos);
-            a.push(cb.call(thisArg, v, k, this));
-            this._unlockLine(pos);
-            this._unlockSharedRead();
+            try {
+                a.push(cb.call(thisArg, v, k, this));
+                this._unlockLine(pos);
+                this._unlockSharedRead();
+            } catch (e) {
+                this._unlockLine(pos);
+                this._unlockSharedRead();
+                throw e;
+            }
         }
         return a;
     }
@@ -616,9 +622,15 @@ class SharedMap {
         for (let pos of this._keys(false)) {
             const k = this._decodeKey(pos);
             const v = this._decodeValue(pos);
-            a = cb(a, v, k, this);
-            this._unlockLine(pos);
-            this._unlockSharedRead();
+            try {
+                a = cb(a, v, k, this);
+                this._unlockLine(pos);
+                this._unlockSharedRead();
+            } catch (e) {
+                this._unlockLine(pos);
+                this._unlockSharedRead();
+                throw e;
+            }
         }
         return a;
     }
