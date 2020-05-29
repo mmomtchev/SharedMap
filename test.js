@@ -49,11 +49,26 @@ function testMap(map, mypart, parts, out) {
         out(`t: ${mypart} ${map.length}/${map.size} elements in map`);
 
         let c = 0;
-        /* eslint-disable no-unused-vars */
         for (let i of map.keys())
-            c++;
-        /* eslint-enable no-unused-vars */
+            if (map.get(i) === undefined)
+                out(`t: ${mypart} value ${i} deleted under our nose`);
+            else
+                c++;
         out(`t: ${mypart} ${map.length}/${map.size} elements in map, counted ${c}`);
+
+        c = 0;
+        let c2 = 0;
+        map.lockWrite();
+        for (let i of map.keys())
+            if (map.get(i) === undefined)
+                throw new Error(`value ${i} deleted under our nose`);
+            else
+                c++;
+        c2 = map.reduce((a) => a + 1, 0);
+        if (c2 !== c)
+            throw new Error(`counted ${c} != ${c2}`);
+        out(`t: ${mypart} with writeLock ${map.length}/${map.size} elements in map, counted ${c} == ${c2}`);
+        map.unlockWrite();
     }
     const ops = map.stats.get + map.stats.set + map.stats.delete;
     const t = Date.now() - t0;
@@ -62,8 +77,14 @@ function testMap(map, mypart, parts, out) {
 
 if (workerThreads.isMainThread) {
     const myMap = new SharedMap(MAPSIZE, KEYSIZE, OBJSIZE);
+    myMap.set('test', 2);
     myMap.set('test', 1);
+    myMap.set('test2', 3);
+    const mmap = myMap.map((v, k) => ({ k, v }));
+    const accu = myMap.reduce((a, x) => a + (+x), 0);
+    console.assert(mmap.length === 2);
     console.assert(myMap.get('test') === '1');
+    console.assert(accu === 4);
     myMap.clear();
     console.assert(!myMap.has('test') && myMap.length === 0 && myMap.get('test') === undefined);
     try {
@@ -90,6 +111,7 @@ if (workerThreads.isMainThread) {
     const workers = new Array(NWORKERS).fill(undefined);
     for (let w in workers) {
         workers[w] = new workerThreads.Worker('./test.js', { workerData: { map: myMap, part: w, parts: NWORKERS } });
+        workers[w].on('online', () => console.log(`worker ${w} started`));
         workers[w].on('message', (m) => console.log(m));
         workers[w].on('error', (e) => { console.log(e); myMap.__printMap(); });
         workers[w].on('exit', () => {

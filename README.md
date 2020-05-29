@@ -1,6 +1,7 @@
 # SharedMap
 
  * ***zero-dependency***
+ * high-performance
  * Vanilla JS implementation of SharedMap,
  * a synchronous multi-threading capable,
  * fine-grain-locked with deadlock recovery,
@@ -16,11 +17,11 @@
 Due to its legacy as a simple Web page glue, JS has what is probably the absolutely worst support of multi-threading among all languages created in the last few decades.
 
 As the language matures, driven by a remarkably well implemented engine (V8) and the unique promise of unifying back-end, front-end and desktop application development, real multi-threading for CPU-bound tasks is becoming an absolute necessity.
-In a true JS spirit, a feature after feature is added, some projects implementing it, others boycotting it, leaving it to the crowd to eventually decide what is worth supporting and what is not. As much as this can appear appalling to computer language experts, it is in a quite a way reminiscent of how the Linux kernel imposted itself vs the tech giants 20 years ago, and this is how JS is today on its way to total dominance for the years to come.
+In a true JS spirit, a feature after feature is added, some projects implementing it, others boycotting it, leaving it to the crowd to eventually decide what is worth supporting and what is not. As much as this can appear appalling to computer language experts, it is in a quite a way reminiscent of how the Linux kernel imposted itself vs the tech giants 20 years ago, and this is how JS is today on its way to total dominance as the leading general-purpose language.
 
 The current situation with **SharedArrayBuffer** is a perfect example of this JS spirit. In the hope that at some point in the near future Firefox will re-enable it by default, and Safari will implement it, **SharedMap** is proposed as a working solution for computationally-heavy back-end programs executing in Node.js.
 
-**SharedMap** is browser-compatible in theory, but on the front-end side, when one of the major browsers is completely missing (*Safari*), and another one requires the user to go through a security warning to enable an obscure feature (*Firefox*), its usefulness will be severely limited. For this reason I haven't even bothered to include an ES Modules interface.
+**SharedMap** is browser-compatible in theory, but on the front-end side, when one of the major browsers is completely missing (*Safari*), and another one requires the user to go through a security warning to enable an obscure feature (*Firefox*), its usefulness will be severely limited. For this reason I haven't even bothered to include an ES Modules interface, but you are free to try it in your Chrome/Edge-exclusive project.
 
 **SharedMap** was motivated by [igc-xc-score](https://github.com/mmomtchev/igc-xc-score), a linear optimization solver for scoring paragliding flights. When I started it, I initially tried Python because of its flawless multi-threading and then I slowly realized that the single-threaded V8 implementation was faster then the 4-way multi-threaded Python3 (and PyPy) implementation. Love it or hate it, JS is here to stay for the years to come.
 
@@ -38,6 +39,8 @@ The default hash function is MurmurHash2 which works very well for words. You ca
 It supports deleting and will rechain itself when needed. The rechaining can be quite small and can be further optimized.
 
 It supports single-line locking with deadlock recovery. Unless a deadlock is detected, *get* and *set* require only a shared global lock and lock exclusively no more than two lines so multiple operations can run in parallel. *delete* requires an exclusive lock and it is slow.
+
+There are also thread-safe implementations of map() and reduce() and a public method allowing a program to temporarily lock out writers.
 
 ## Installation
 
@@ -66,15 +69,31 @@ if (workerThreads.isMainThread) {
 
     myMap.set('prop1', 'val1');
     myMap.set('prop2', 12);
+
     console.assert(myMap.get('prop1') == 'val1');
     console.assert(myMap.get('prop2') == '12');     // Numbers will be converted to strings
+
     myMap.set('prop3', JSON.Stringify('a'));        // You can store objects if you serialize them
+
     myMap.delete('prop2');
     console.assert(myMap.hash('prop2') == false);
     console.assert(myMap.length === 1);
+
     for (let k of myMap.keys())                     // SharedMap.keys() is a generator
-        console.assert(myMap.has(k));
-    const allKeys = Array.from(myMap.keys());
+        console.assert(myMap.has(k));               // could fail if another thread deletes k under our nose
+
+    myMap.lockWrite();
+    for (let k of myMap.keys())
+        console.assert(myMap.has(k));               // will never fail
+    myMap.unlockWrite();
+
+    const sum = map.reduce((a, x) => a += (+x), 0); // Both are thread-safe without lock, but there could 
+    const allKeys = Array.from(myMap.keys());       // be values added/deleted while the operation runs
+
+    // get & has in the callback are allowed, set & delete are not
+    // map.get(index)=currentValue is guaranteed while the callback runs
+    const sumMul = map.reduce((a, x, i) => a += (+map.get(i)), 0); 
+
     myMap.clear();
 }
 ```
