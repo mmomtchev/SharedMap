@@ -79,6 +79,10 @@ if (workerThreads.isMainThread) {
 }
 ```
 
+## Manual
+
+[jsdoc](https://mmomtchev.github.io/SharedMap/)
+
 ## TODO and contributing
 
 * Avoid unncessary copying when rechaining on delete
