@@ -46,6 +46,7 @@
         <article><h1>SharedMap</h1>
 <ul>
 <li><em><strong>zero-dependency</strong></em></li>
+<li>high-performance</li>
 <li>Vanilla JS implementation of SharedMap,</li>
 <li>a synchronous multi-threading capable,</li>
 <li>fine-grain-locked with deadlock recovery,</li>
@@ -59,9 +60,9 @@
 <h2>Introduction</h2>
 <p>Due to its legacy as a simple Web page glue, JS has what is probably the absolutely worst support of multi-threading among all languages created in the last few decades.</p>
 <p>As the language matures, driven by a remarkably well implemented engine (V8) and the unique promise of unifying back-end, front-end and desktop application development, real multi-threading for CPU-bound tasks is becoming an absolute necessity.
-In a true JS spirit, a feature after feature is added, some projects implementing it, others boycotting it, leaving it to the crowd to eventually decide what is worth supporting and what is not. As much as this can appear appalling to computer language experts, it is in a quite a way reminiscent of how the Linux kernel imposted itself vs the tech giants 20 years ago, and this is how JS is today on its way to total dominance for the years to come.</p>
+In a true JS spirit, a feature after feature is added, some projects implementing it, others boycotting it, leaving it to the crowd to eventually decide what is worth supporting and what is not. As much as this can appear appalling to computer language experts, it is in a quite a way reminiscent of how the Linux kernel imposted itself vs the tech giants 20 years ago, and this is how JS is today on its way to total dominance as the leading general-purpose language.</p>
 <p>The current situation with <strong>SharedArrayBuffer</strong> is a perfect example of this JS spirit. In the hope that at some point in the near future Firefox will re-enable it by default, and Safari will implement it, <strong>SharedMap</strong> is proposed as a working solution for computationally-heavy back-end programs executing in Node.js.</p>
-<p><strong>SharedMap</strong> is browser-compatible in theory, but on the front-end side, when one of the major browsers is completely missing (<em>Safari</em>), and another one requires the user to go through a security warning to enable an obscure feature (<em>Firefox</em>), its usefulness will be severely limited. For this reason I haven't even bothered to include an ES Modules interface.</p>
+<p><strong>SharedMap</strong> is browser-compatible in theory, but on the front-end side, when one of the major browsers is completely missing (<em>Safari</em>), and another one requires the user to go through a security warning to enable an obscure feature (<em>Firefox</em>), its usefulness will be severely limited. For this reason I haven't even bothered to include an ES Modules interface, but you are free to try it in your Chrome/Edge-exclusive project.</p>
 <p><strong>SharedMap</strong> was motivated by <a href="https://github.com/mmomtchev/igc-xc-score">igc-xc-score</a>, a linear optimization solver for scoring paragliding flights. When I started it, I initially tried Python because of its flawless multi-threading and then I slowly realized that the single-threaded V8 implementation was faster then the 4-way multi-threaded Python3 (and PyPy) implementation. Love it or hate it, JS is here to stay for the years to come.</p>
 <h2>About</h2>
 <p>Because of the severe limitations that <strong>SharedArrayBuffer</strong> imposes, <strong>SharedMap</strong> supports only numbers and strings and uses fixed memory allocation. It uses synchronous locking, implemented on top of the <strong>Atomics</strong> interface.</p>
@@ -71,6 +72,7 @@ This chart shows the performance drop for a SharedMap with 370k English words an
 <p>The default hash function is MurmurHash2 which works very well for words. You can provide your own hash function by override the <em>hash</em> property.</p>
 <p>It supports deleting and will rechain itself when needed. The rechaining can be quite small and can be further optimized.</p>
 <p>It supports single-line locking with deadlock recovery. Unless a deadlock is detected, <em>get</em> and <em>set</em> require only a shared global lock and lock exclusively no more than two lines so multiple operations can run in parallel. <em>delete</em> requires an exclusive lock and it is slow.</p>
+<p>There are also thread-safe implementations of map() and reduce() and a public method allowing a program to temporarily lock out writers.</p>
 <h2>Installation</h2>
 <pre class="prettyprint source lang-bash"><code>npm install sharedmap
 </code></pre>
@@ -94,15 +96,31 @@ if (workerThreads.isMainThread) {
 
     myMap.set('prop1', 'val1');
     myMap.set('prop2', 12);
+
     console.assert(myMap.get('prop1') == 'val1');
     console.assert(myMap.get('prop2') == '12');     // Numbers will be converted to strings
+
     myMap.set('prop3', JSON.Stringify('a'));        // You can store objects if you serialize them
+
     myMap.delete('prop2');
     console.assert(myMap.hash('prop2') == false);
     console.assert(myMap.length === 1);
+
     for (let k of myMap.keys())                     // SharedMap.keys() is a generator
-        console.assert(myMap.has(k));
-    const allKeys = Array.from(myMap.keys());
+        console.assert(myMap.has(k));               // could fail if another thread deletes k under our nose
+
+    myMap.lockWrite();
+    for (let k of myMap.keys())
+        console.assert(myMap.has(k));               // will never fail
+    myMap.unlockWrite();
+
+    const sum = map.reduce((a, x) => a += (+x), 0); // Both are thread-safe without lock, but there could 
+    const allKeys = Array.from(myMap.keys());       // be values added/deleted while the operation runs
+
+    // get & has in the callback are allowed, set & delete are not
+    // map.get(index)=currentValue is guaranteed while the callback runs
+    const sumMul = map.reduce((a, x, i) => a += (+map.get(i)), 0); 
+
     myMap.clear();
 }
 </code></pre>
@@ -126,13 +144,13 @@ if (workerThreads.isMainThread) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="SharedMap.html">SharedMap</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="SharedMap.html">SharedMap</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 29 2020 12:07:57 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 29 2020 15:09:39 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

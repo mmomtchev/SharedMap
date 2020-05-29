@@ -91,7 +91,7 @@ if (workerThreads.isMainThread) {
     const allKeys = Array.from(myMap.keys());       // be values added/deleted while the operation runs
 
     // get & has in the callback are allowed, set & delete are not
-    // map.get(index)=currentValue is guaranteed while the callback runs
+    // map.get(key)=currentValue is guaranteed while the callback runs
     const sumMul = map.reduce((a, x, i) => a += (+map.get(i)), 0); 
 
     myMap.clear();

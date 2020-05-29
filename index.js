@@ -560,11 +560,21 @@ class SharedMap {
     }
 
     /**
+     * @callback mapCallback callback(currentValue[, key[, map]] )}
+     * map.get(key)=currentValue is guaranteed while the callback runs
+     * Manipulation of the SharedMap in the callback must be limited to get/has
+     * 
+     * @param {string} currentValue
+     * @param {string} key
+     * @param {SharedMap} map
+     */
+
+    /**
      * A thread-safe map(). Doesn't block additions or deletions
      * between two calls of the callback
      * map.get(index)=currentValue is guaranteed while the callback runs
      * Manipulation of the SharedMap in the callback must be limited to get/has
-     * @param {function callback(currentValue[, index[, SharedMap]]}
+     * 
      * @param thisArg callback will have its this set to thisArg
      * @return {Array}
      */
@@ -581,13 +591,25 @@ class SharedMap {
     }
 
     /**
+     * @callback reduceCallback callback(accumulator, currentValue[, key[, map]] )}
+     * map.get(key)=currentValue is guaranteed while the callback runs
+     * Manipulation of the SharedMap in the callback must be limited to get/has
+     * 
+     * @param accumulator
+     * @param {string} currentValue
+     * @param {string} key
+     * @param {SharedMap} map
+     */
+
+    /**
      * A thread-safe reduce(). Doesn't block additions or deletions
      * between two calls of the callback
-     * map.get(index)=currentValue is guaranteed while the callback runs
+     * map.get(key)=currentValue is guaranteed while the callback runs
      * Manipulation of the SharedMap in the callback must be limited to get/has
-     * @param {function callback(accumulator, currentValue[, index[, array]] )}
+     * 
+     * @param {reduceCallback} cb callback
      * @param initialValue initial value of the accumulator
-     * @return {Array}
+     * @return {Object}
      */
     reduce(cb, initialValue) {
         let a = initialValue;
