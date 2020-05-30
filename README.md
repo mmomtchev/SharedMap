@@ -14,6 +14,7 @@
  * compatible with both Node.js and SharedArrayBuffer-enabled browsers
 
  [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+ ![Node.js CI](https://github.com/mmomtchev/SharedMap/workflows/Node.js%20CI/badge.svg)
 
 ## Introduction
 
