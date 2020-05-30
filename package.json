@@ -4,7 +4,7 @@
   "description": "Multithreading-compatible SharedMap in vanilla JS",
   "main": "index.js",
   "scripts": {
-    "test": "node test",
+    "test": "node --experimental-worker test",
     "preversion": "npm test && eslint index.js test.js",
     "minify": "terser index.js -o index.min.js",
     "doc": "jsdoc index.js README.md -d docs",
