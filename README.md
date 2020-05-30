@@ -54,7 +54,8 @@ npm install sharedmap
 const SharedMap = require('SharedMap');
 
 const MAPSIZE = 128 * 1024 * 1024;
-const KEYSIZE = 48;                 // Do not forget that JS uses UTF-16 encoding
+// Size is in UTF-16 codepoints
+const KEYSIZE = 48;
 const OBJSIZE = 16;
 const NWORKERS = require('os').cpus().length;
 
@@ -62,47 +63,60 @@ if (workerThreads.isMainThread) {
     const myMap = new SharedMap(MAPSIZE, KEYSIZE, OBJSIZE);
     workers = new Array(NWORKERS).fill(undefined);
     for (let w in workers) {
-        workers[w] = new workerThreads.Worker('./test.js', { workerData: { map: myMap } });
+        workers[w] = new workerThreads.Worker('./test.js',
+            { workerData: { map: myMap } });
     }
 } else {
-    const myMap = workerThreads.workerData.map;     // You can also send it through a MessagePort
-    myMap.__proto__ = SharedMap.prototype;          // You have to manually restore the prototype
+    // You can also send it through a MessagePort
+    const myMap = workerThreads.workerData.map;
+
+    // You have to manually restore the prototype
+    myMap.__proto__ = SharedMap.prototype;
 
     myMap.set('prop1', 'val1');
     myMap.set('prop2', 12);
 
+    // Numbers will be converted to strings
     console.assert(myMap.get('prop1') == 'val1');
-    console.assert(myMap.get('prop2') == '12');     // Numbers will be converted to strings
+    console.assert(myMap.get('prop2') == '12');
 
-    myMap.set('prop3', JSON.Stringify('a'));        // You can store objects if you serialize them
+    // You can store objects if you serialize them
+    myMap.set('prop3', JSON.Stringify('a'));
 
     myMap.delete('prop2');
     console.assert(myMap.hash('prop2') == false);
     console.assert(myMap.length === 1);
 
-    for (let k of myMap.keys())                     // SharedMap.keys() is a generator
-        console.assert(myMap.has(k));               // could fail if another thread deletes k under our nose
+    // SharedMap.keys() is a generator
+    for (let k of myMap.keys())
+        // could fail if another thread deletes k under our nose
+        console.assert(myMap.has(k));
 
     myMap.lockWrite();
     for (let k of myMap.keys())
-        console.assert(myMap.has(k));               // will never fail, but locks out writers
+        // will never fail, but locks out writers
+        console.assert(myMap.has(k));
     myMap.unlockWrite();
 
     // Both are thread-safe without lock, but there could
     // be values added/deleted/modified while the operation runs
-    // These operations will be atomic, so all values read will be coherent
+    // These operations will be atomic, so all values read will
+    // be coherent
+    // map.get(key)=currentValue is guaranteed while the callback runs
+    //
+    // Don't manipulate the map in the callback, see the explicit locking
+    // example below if you need to do it
     const sum = map.reduce((a, x) => a += (+x), 0);
     const allKeys = Array.from(myMap.keys());
-
-    // map.get(key)=currentValue is guaranteed while the callback runs
-    const sum2 = map.reduce((a, x, i) => a += (+map.get('some other element')), 0);
 
     // Update with explicit locking
     // Other threads can continue reading, set operations will be atomic
     // In real-life you will also handle the exceptions
     myMap.lockWrite();
     for (let k of myMap.keys({lockWrite: true}))
-        myMap.set(k, myMap.get(k, {lockWrite: true}).toUpperCase(), {lockWrite: true});
+        myMap.set(k,
+            myMap.get(k, {lockWrite: true}).toUpperCase(),
+            {lockWrite: true});
     myMap.unlockWrite();
     
     myMap.clear();
