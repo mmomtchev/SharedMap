@@ -245,7 +245,13 @@ class SharedMap {
      * All operations that need it, automatically acquire it,
      * Use only if you need to block all other threads from writing to the map,
      * The thread holding the lock can then call map.set(k, v, {lockHeld: true})
-     * @example map.lockWrite(); sum = map.reduce((a, x) => a += (+x), 0); map.unlockWrite();
+     * @example
+     * myMap.lockWrite();
+     * for (let k of myMap.keys({lockWrite: true}))
+     *   myMap.set(k,
+     *     myMap.get(k, {lockWrite: true}).toUpperCase(),
+     *     {lockWrite: true});
+     * myMap.unlockWrite();
      * @return {void}
      */
     lockWrite() {
@@ -297,13 +303,23 @@ class SharedMap {
         process.exit(1);
     }
 
+    _write(pos, key, value, exclusive) {
+        const buckets = Math.ceil(value.length / this.meta[META.objSize]);
+        let i;
+        for (i = 0; i < key.length; i++)
+            this.keysData[pos * this.meta[META.keySize] + i] = key.charCodeAt(i);
+        this.keysData[pos * this.meta[META.keySize] + i] = 0;
+        for (i = 0; i < value.length; i++)
+            this.valuesData[pos * this.meta[META.objSize] + i] = value.charCodeAt(i);
+        this.valuesData[pos * this.meta[META.objSize] + i] = 0;
+    }
+
     /**
     * @typedef SharedMapOptions
     * @type {object}
     * @property {boolean} lockWrite Already holding write lock, useful when manually locking with lockWrite
     * @property {boolean} lockExclusive Already holding exclusive lock, useful when manually locking with lockExclusive
     */
-
     _set(key, value, exclusive) {
         /* Hash */
         let pos = this._hash(key);
@@ -341,13 +357,7 @@ class SharedMap {
             if (Atomics.load(this.meta, META.length) === this.meta[META.maxSize])
                 throw new RangeError('SharedMap is full');
             /* Copy the element into place, chaining when needed */
-            let i;
-            for (i = 0; i < key.length; i++)
-                this.keysData[pos * this.meta[META.keySize] + i] = key.charCodeAt(i);
-            this.keysData[pos * this.meta[META.keySize] + i] = 0;
-            for (i = 0; i < value.length; i++)
-                this.valuesData[pos * this.meta[META.objSize] + i] = value.charCodeAt(i);
-            this.valuesData[pos * this.meta[META.objSize] + i] = 0;
+            this._write(pos, key, value, exclusive);
             this.chaining[pos] = UINT32_UNDEFINED;
             /* Use Atomics to increase the length, we do not hold an exclusive lock here */
             Atomics.add(this.meta, META.length, 1);
@@ -586,7 +596,7 @@ class SharedMap {
      * @callback mapCallback callback(currentValue[, key] )}
      * map.get(key)=currentValue is guaranteed while the callback runs,
      * You shall not manipulate the map in the callback, use an explicitly-locked
-     * keys() in this case (look at the examples in the README.md)
+     * keys() in this case (look at the example for lockWrite)
      *
      * @param {string} currentValue
      * @param {string} [key]
@@ -598,7 +608,7 @@ class SharedMap {
      * all map operations are guaranteed atomic,
      * map.get(index)=currentValue is guaranteed while the callback runs,
      * You shall not manipulate the map in the callback, use an explicitly-locked
-     * keys() in this case (look at the examples in the README.md)
+     * keys() in this case (look at the example for lockWrite)
      *
      * @param {mapCallback} cb callback
      * @param {*} [thisArg] callback will have its this set to thisArg
@@ -627,8 +637,8 @@ class SharedMap {
      * all map operations are guaranteed atomic,
      * map.get(key)=currentValue is guaranteed while the callback runs,
      * You shall not manipulate the map in the callback, use an explicitly-locked
-     * keys() in this case (look at the examples in the README.md)
-     * 
+     * keys() in this case (look at the example for lockWrite)
+     *
      * @param accumulator
      * @param {string} currentValue
      * @param {string} [key]
@@ -639,8 +649,8 @@ class SharedMap {
      * between two calls of the callback,
      * map.get(key)=currentValue is guaranteed while the callback runs,
      * You shall not manipulate the map in the callback, use an explicitly-locked
-     * keys() in this case (look at the examples in the README.md)
-     * 
+     * keys() in this case (look at the example for lockWrite)
+     *
      * @param {reduceCallback} cb callback
      * @param {*} initialValue initial value of the accumulator
      * @return {*}

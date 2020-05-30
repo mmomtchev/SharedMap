@@ -34,6 +34,7 @@
 
 zero-dependency
 high-performance
+unordered
 Vanilla JS implementation of SharedMap,
 a synchronous multi-threading capable,
 fine-grain-locked with deadlock recovery,
@@ -211,7 +212,7 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line95">line 95</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line96">line 96</a>
     </li></ul></dd>
     
 
@@ -330,7 +331,7 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line132">line 132</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line133">line 133</a>
     </li></ul></dd>
     
 
@@ -392,7 +393,7 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line141">line 141</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line142">line 142</a>
     </li></ul></dd>
     
 
@@ -472,7 +473,7 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line645">line 645</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line680">line 680</a>
     </li></ul></dd>
     
 
@@ -526,7 +527,7 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     
 
     
-    <h4 class="name" id="delete"><span class="type-signature"></span>delete<span class="signature">(key)</span><span class="type-signature"> &rarr; {void}</span></h4>
+    <h4 class="name" id="delete"><span class="type-signature"></span>delete<span class="signature">(key, opt<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {void}</span></h4>
     
 
     
@@ -558,6 +559,8 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -583,10 +586,51 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#SharedMapOptions">SharedMapOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">options, { lockExclusive: true } if manually calling lockExlusive</td>
         </tr>
 
     
@@ -627,7 +671,7 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line492">line 492</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line516">line 516</a>
     </li></ul></dd>
     
 
@@ -651,8 +695,8 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
 
 
 <h5>Throws:</h5>
-
-        
+<ul>
+        <li>
 
 <dl>
     <dt>
@@ -677,8 +721,35 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     <dd></dd>
 </dl>
 
-
+</li>
     
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        when calling map.delete(key, value, { lockWrite: true, lockExclusive: false })
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
 
 
 <h5>Returns:</h5>
@@ -710,7 +781,7 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     
 
     
-    <h4 class="name" id="get"><span class="type-signature"></span>get<span class="signature">(key)</span><span class="type-signature"> &rarr; {string|undefined}</span></h4>
+    <h4 class="name" id="get"><span class="type-signature"></span>get<span class="signature">(key, opt<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {string|undefined}</span></h4>
     
 
     
@@ -742,6 +813,8 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -767,10 +840,51 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#SharedMapOptions">SharedMapOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">options, { lockWrite: true } if manually calling lockWrite</td>
         </tr>
 
     
@@ -811,7 +925,7 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line437">line 437</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line457">line 457</a>
     </li></ul></dd>
     
 
@@ -868,7 +982,7 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     
 
     
-    <h4 class="name" id="has"><span class="type-signature"></span>has<span class="signature">(key)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    <h4 class="name" id="has"><span class="type-signature"></span>has<span class="signature">(key, opt<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
     
 
     
@@ -900,6 +1014,8 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -925,10 +1041,51 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#SharedMapOptions">SharedMapOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">options, { lockWrite: true } if manually calling lockWrite</td>
         </tr>
 
     
@@ -969,7 +1126,7 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line473">line 473</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line495">line 495</a>
     </li></ul></dd>
     
 
@@ -1023,7 +1180,7 @@ compatible with both Node.js and SharedArrayBuffer-enabled browsers</div>
     
 
     
-    <h4 class="name" id="keys"><span class="type-signature">(generator) </span>keys<span class="signature">()</span><span class="type-signature"> &rarr; {Iterable}</span></h4>
+    <h4 class="name" id="keys"><span class="type-signature">(generator) </span>keys<span class="signature">(opt<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Iterable}</span></h4>
     
 
     
@@ -1041,6 +1198,67 @@ additions and deletions during the iteration
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>opt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#SharedMapOptions">SharedMapOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">options, { lockWrite: true } if manually calling lockWrite</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -1076,7 +1294,7 @@ additions and deletions during the iteration
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line556">line 556</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line585">line 585</a>
     </li></ul></dd>
     
 
@@ -1130,7 +1348,7 @@ additions and deletions during the iteration
     
 
     
-    <h4 class="name" id="lockWrite"><span class="type-signature"></span>lockWrite<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span></h4>
+    <h4 class="name" id="lockExclusive"><span class="type-signature"></span>lockExclusive<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span></h4>
     
 
     
@@ -1138,10 +1356,10 @@ additions and deletions during the iteration
 
 
 <div class="description">
-    Acquire a write lock,
+    Acquire an exclusive lock,
 All operations that need it, automatically acquire it,
-Use only if you need to block all other threads from writing to the map,
-map.lockWrite(); map.set(a, b); will currently fail!
+Use only if you need to block all other threads from accessing the map;
+The thread holding the lock can then call map.set(k, v, {lockHeld: true})
 </div>
 
 
@@ -1185,7 +1403,116 @@ map.lockWrite(); map.set(a, b); will currently fail!
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line251">line 251</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line201">line 201</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">void</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="lockWrite"><span class="type-signature"></span>lockWrite<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Acquire a write lock,
+All operations that need it, automatically acquire it,
+Use only if you need to block all other threads from writing to the map,
+The thread holding the lock can then call map.set(k, v, {lockHeld: true})
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line257">line 257</a>
     </li></ul></dd>
     
 
@@ -1234,7 +1561,12 @@ map.lockWrite(); map.set(a, b); will currently fail!
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>map.lockWrite(); sum = map.reduce((a, x) => a += (+x), 0); map.unlockWrite();</code></pre>
+    <pre class="prettyprint"><code>myMap.lockWrite();
+for (let k of myMap.keys({lockWrite: true}))
+  myMap.set(k,
+    myMap.get(k, {lockWrite: true}).toUpperCase(),
+    {lockWrite: true});
+myMap.unlockWrite();</code></pre>
 
 
 
@@ -1244,7 +1576,7 @@ map.lockWrite(); map.set(a, b); will currently fail!
     
 
     
-    <h4 class="name" id="map"><span class="type-signature"></span>map<span class="signature">(thisArg)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    <h4 class="name" id="map"><span class="type-signature"></span>map<span class="signature">(cb, thisArg<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Array}</span></h4>
     
 
     
@@ -1254,8 +1586,10 @@ map.lockWrite(); map.set(a, b); will currently fail!
 <div class="description">
     A thread-safe map(). Doesn't block additions or deletions
 between two calls of the callback,
+all map operations are guaranteed atomic,
 map.get(index)=currentValue is guaranteed while the callback runs,
-Manipulation of the SharedMap in the callback must be limited to get/has
+You shall not manipulate the map in the callback, use an explicitly-locked
+keys() in this case (look at the example for lockWrite)
 </div>
 
 
@@ -1279,6 +1613,8 @@ Manipulation of the SharedMap in the callback must be limited to get/has
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -1291,13 +1627,59 @@ Manipulation of the SharedMap in the callback must be limited to get/has
 
         <tr>
             
+                <td class="name"><code>cb</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#mapCallback">mapCallback</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">callback</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>thisArg</code></td>
             
 
             <td class="type">
             
+                
+<span class="param-type">*</span>
+
+
+            
             </td>
 
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1343,7 +1725,7 @@ Manipulation of the SharedMap in the callback must be limited to get/has
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line584">line 584</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line617">line 617</a>
     </li></ul></dd>
     
 
@@ -1397,7 +1779,7 @@ Manipulation of the SharedMap in the callback must be limited to get/has
     
 
     
-    <h4 class="name" id="reduce"><span class="type-signature"></span>reduce<span class="signature">(cb, initialValue)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="reduce"><span class="type-signature"></span>reduce<span class="signature">(cb, initialValue)</span><span class="type-signature"> &rarr; {*}</span></h4>
     
 
     
@@ -1408,7 +1790,8 @@ Manipulation of the SharedMap in the callback must be limited to get/has
     A thread-safe reduce(). Doesn't block additions or deletions
 between two calls of the callback,
 map.get(key)=currentValue is guaranteed while the callback runs,
-Manipulation of the SharedMap in the callback must be limited to get/has
+You shall not manipulate the map in the callback, use an explicitly-locked
+keys() in this case (look at the example for lockWrite)
 </div>
 
 
@@ -1472,6 +1855,11 @@ Manipulation of the SharedMap in the callback must be limited to get/has
 
             <td class="type">
             
+                
+<span class="param-type">*</span>
+
+
+            
             </td>
 
             
@@ -1519,7 +1907,7 @@ Manipulation of the SharedMap in the callback must be limited to get/has
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line623">line 623</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line658">line 658</a>
     </li></ul></dd>
     
 
@@ -1555,7 +1943,7 @@ Manipulation of the SharedMap in the callback must be limited to get/has
     </dt>
     <dd>
         
-<span class="param-type">Object</span>
+<span class="param-type">*</span>
 
 
     </dd>
@@ -1573,7 +1961,7 @@ Manipulation of the SharedMap in the callback must be limited to get/has
     
 
     
-    <h4 class="name" id="set"><span class="type-signature"></span>set<span class="signature">(key, value)</span><span class="type-signature"> &rarr; {void}</span></h4>
+    <h4 class="name" id="set"><span class="type-signature"></span>set<span class="signature">(key, value, opt<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {void}</span></h4>
     
 
     
@@ -1605,6 +1993,8 @@ Manipulation of the SharedMap in the callback must be limited to get/has
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -1629,6 +2019,14 @@ Manipulation of the SharedMap in the callback must be limited to get/has
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1656,10 +2054,51 @@ Manipulation of the SharedMap in the callback must be limited to get/has
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#SharedMapOptions">SharedMapOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">options, { lockWrite: true } if manually calling lockWrite</td>
         </tr>
 
     
@@ -1700,7 +2139,7 @@ Manipulation of the SharedMap in the callback must be limited to get/has
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line372">line 372</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line390">line 390</a>
     </li></ul></dd>
     
 
@@ -1837,6 +2276,112 @@ Manipulation of the SharedMap in the callback must be limited to get/has
     
 
     
+    <h4 class="name" id="unlockExclusive"><span class="type-signature"></span>unlockExclusive<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Release the exclusive lock
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line209">line 209</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">void</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="unlockWrite"><span class="type-signature"></span>unlockWrite<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span></h4>
     
 
@@ -1889,7 +2434,7 @@ Manipulation of the SharedMap in the callback must be limited to get/has
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line260">line 260</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line266">line 266</a>
     </li></ul></dd>
     
 
@@ -1959,7 +2504,7 @@ Manipulation of the SharedMap in the callback must be limited to get/has
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 29 2020 15:41:22 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sat May 30 2020 11:38:54 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -106,7 +106,7 @@
     
 
     
-    <h4 class="name" id="mapCallback"><span class="type-signature"></span>mapCallback<span class="signature">(currentValue, key, map)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="mapCallback"><span class="type-signature"></span>mapCallback<span class="signature">(currentValue, key<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
     
 
     
@@ -134,6 +134,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -159,6 +161,14 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
@@ -182,28 +192,15 @@
             </td>
 
             
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>map</code></td>
-            
-
-            <td class="type">
-            
+                <td class="attributes">
                 
-<span class="param-type"><a href="SharedMap.html">SharedMap</a></span>
+                    &lt;optional><br>
+                
 
+                
 
-            
-            </td>
-
+                
+                </td>
             
 
             
@@ -249,7 +246,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line565">line 565</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line595">line 595</a>
     </li></ul></dd>
     
 
@@ -285,7 +282,7 @@
     
 
     
-    <h4 class="name" id="reduceCallback"><span class="type-signature"></span>reduceCallback<span class="signature">(accumulator, currentValue, key, map)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="reduceCallback"><span class="type-signature"></span>reduceCallback<span class="signature">(accumulator, currentValue, key<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
     
 
     
@@ -312,6 +309,8 @@
 
         <th>Type</th>
 
+        
+        <th>Attributes</th>
         
 
         
@@ -333,6 +332,14 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
@@ -355,6 +362,14 @@
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -379,28 +394,15 @@
             </td>
 
             
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>map</code></td>
-            
-
-            <td class="type">
-            
+                <td class="attributes">
                 
-<span class="param-type"><a href="SharedMap.html">SharedMap</a></span>
+                    &lt;optional><br>
+                
 
+                
 
-            
-            </td>
-
+                
+                </td>
             
 
             
@@ -446,7 +448,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line602">line 602</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line635">line 635</a>
     </li></ul></dd>
     
 
@@ -470,6 +472,149 @@
 
 
 
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="SharedMapOptions">SharedMapOptions</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>lockWrite</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Already holding write lock, useful when manually locking with lockWrite</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lockExclusive</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Already holding exclusive lock, useful when manually locking with lockExclusive</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line317">line 317</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
 
 
 
@@ -496,7 +641,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 29 2020 15:41:22 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sat May 30 2020 11:38:54 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
