@@ -72,6 +72,7 @@ class Deadlock extends Error {
  * 
  * zero-dependency
  * high-performance
+ * unordered
  * Vanilla JS implementation of SharedMap,
  * a synchronous multi-threading capable,
  * fine-grain-locked with deadlock recovery,
@@ -193,8 +194,8 @@ class SharedMap {
     /**
      * Acquire an exclusive lock,
      * All operations that need it, automatically acquire it,
-     * Use only if you need to block all other threads from accessing the map
-     * @private
+     * Use only if you need to block all other threads from accessing the map;
+     * The thread holding the lock can then call map.set(k, v, {lockHeld: true})
      * @return {void}
      */
     lockExclusive() {
@@ -203,7 +204,6 @@ class SharedMap {
 
     /**
      * Release the exclusive lock
-     * @private
      * @return {void}
      */
     unlockExclusive() {
@@ -244,7 +244,7 @@ class SharedMap {
      * Acquire a write lock,
      * All operations that need it, automatically acquire it,
      * Use only if you need to block all other threads from writing to the map,
-     * map.lockWrite(); map.set(a, b); will currently fail!
+     * The thread holding the lock can then call map.set(k, v, {lockHeld: true})
      * @example map.lockWrite(); sum = map.reduce((a, x) => a += (+x), 0); map.unlockWrite();
      * @return {void}
      */
@@ -296,6 +296,13 @@ class SharedMap {
             console.log(this._decodeBucket(i, 0));
         process.exit(1);
     }
+
+    /**
+    * @typedef SharedMapOptions
+    * @type {object}
+    * @property {boolean} lockWrite Already holding write lock, useful when manually locking with lockWrite
+    * @property {boolean} lockExclusive Already holding exclusive lock, useful when manually locking with lockExclusive
+    */
 
     _set(key, value, exclusive) {
         /* Hash */
@@ -364,12 +371,13 @@ class SharedMap {
      * Add/replace an element, fully thread-safe, multiple get/set can execute in parallel
      * @param {string} key
      * @param {string|number} value
+     * @param {SharedMapOptions} [opt] options, { lockWrite: true } if manually calling lockWrite
      * @throws {RangeError} when the map is full
      * @throws {RangeError} when the input values do not fit
      * @throws {TypeError} when the input values are of a wrong type
      * @return {void}
      */
-    set(key, value) {
+    set(key, value, opt) {
         if (typeof key !== 'string' || key.length === 0)
             throw new TypeError(`SharedMap keys must be non-emptry strings, invalid key ${key}`);
         if (typeof value === 'number')
@@ -381,14 +389,15 @@ class SharedMap {
         if (value.length > this.meta[META.objSize])
             throw new RangeError(`SharedMap value ${value} does not fit in ${this.meta[META.objSize] * Uint16Array.BYTES_PER_ELEMENT} bytes, ${this.meta[META.objSize]} UTF-16 code points`);
 
+        const lockHeld = opt && (opt.lockWrite || opt.lockExclusive);
         this.stats.set++;
-        this._lockSharedWrite();
+        lockHeld || this._lockSharedWrite();
         try {
-            this._set(key, value, false);
-            this._unlockSharedWrite();
+            this._set(key, value, lockHeld);
+            lockHeld || this._unlockSharedWrite();
         } catch (e) {
-            this._unlockSharedWrite();
-            if (e instanceof Deadlock) {
+            lockHeld || this._unlockSharedWrite();
+            if (e instanceof Deadlock && !lockHeld) {
                 this.lockExclusive();
                 this.stats.deadlock++;
                 try {
@@ -432,21 +441,23 @@ class SharedMap {
     /**
      * Get an element, fully thread-safe, multiple get/set can execute in parallel
      * @param {string} key
+     * @param {SharedMapOptions} [opt] options, { lockWrite: true } if manually calling lockWrite
      * @return {string|undefined}
      */
-    get(key) {
+    get(key, opt) {
         let pos, val;
-        this._lockSharedRead();
+        const lockHeld = opt && (opt.lockWrite || opt.lockExclusive);
+        lockHeld || this._lockSharedRead();
         try {
-            pos = this._find(key, false);
+            pos = this._find(key, lockHeld);
             if (pos !== undefined) {
                 val = this._decodeValue(pos.pos);
-                this._unlockLine(pos.pos);
+                lockHeld || this._unlockLine(pos.pos);
             }
-            this._unlockSharedRead();
+            lockHeld || this._unlockSharedRead();
         } catch (e) {
-            this._unlockSharedRead();
-            if (e instanceof Deadlock) {
+            lockHeld || this._unlockSharedRead();
+            if (e instanceof Deadlock && !lockHeld) {
                 this.lockExclusive();
                 this.stats.deadlock++;
                 try {
@@ -468,10 +479,11 @@ class SharedMap {
     /**
      * Find an element, fully thread-safe, identical to get(key) !== undefined
      * @param {string} key
+     * @param {SharedMapOptions} [opt] options, { lockWrite: true } if manually calling lockWrite
      * @return {boolean}
      */
-    has(key) {
-        return this.get(key) !== undefined;
+    has(key, opt) {
+        return this.get(key, opt) !== undefined;
     }
 
     _hash(s) {
@@ -486,22 +498,28 @@ class SharedMap {
     /**
      * Delete an element, fully thread-safe, acquires an exlusive lock and it is very expensive
      * @param {string} key
+     * @param {SharedMapOptions} [opt] options, { lockExclusive: true } if manually calling lockExlusive
      * @throws {RangeError} when the key does not exit
+     * @throws {Error} when calling map.delete(key, value, { lockWrite: true, lockExclusive: false })
      * @return {void}
      */
-    delete(key) {
+    delete(key, opt) {
         /* delete is slow */
+        const lockHeld = opt && opt.lockExclusive;
+        if (opt && opt.lockWrite && !lockHeld) {
+            throw new Error('delete requires an exclusive lock');
+        }
         let find;
         try {
-            this.lockExclusive();
+            lockHeld || this.lockExclusive();
             find = this._find(key, true);
         } catch (e) {
-            this.unlockExclusive();
+            lockHeld || this.unlockExclusive();
             throw e;
         }
         if (find === undefined) {
-            this.unlockExclusive();
-            throw RangeError(`SharedMap does not contain key ${key}`);
+            lockHeld || this.unlockExclusive();
+            throw new RangeError(`SharedMap does not contain key ${key}`);
         }
         this.stats.delete++;
         const { pos, previous } = find;
@@ -513,7 +531,7 @@ class SharedMap {
         if (next === UINT32_UNDEFINED) {
             /* There was no further chaining, just delete this element */
             /* and unchain it from the previous */
-            this.unlockExclusive();
+            lockHeld || this.unlockExclusive();
             return;
         }
         /* Full rechaining */
@@ -532,18 +550,18 @@ class SharedMap {
         for (el of chain) {
             this._set(el.key, el.value, true);
         }
-        this.unlockExclusive();
+        lockHeld || this.unlockExclusive();
     }
 
-    *_keys() {
+    *_keys(exclusive) {
         for (let pos = 0; pos < this.meta[META.maxSize]; pos++) {
-            this._lockSharedRead();
-            this._lockLine(pos);
+            exclusive || this._lockSharedRead();
+            exclusive || this._lockLine(pos);
             if (this.keysData[pos * this.meta[META.keySize]] !== 0) {
                 yield pos;
             } else {
-                this._unlockLine(pos);
-                this._unlockSharedRead();
+                exclusive || this._unlockLine(pos);
+                exclusive || this._unlockSharedRead();
             }
         }
     }
@@ -551,34 +569,39 @@ class SharedMap {
     /**
      * A generator that can be used to iterate over the keys, thread-safe but allows
      * additions and deletions during the iteration
+     * @param {SharedMapOptions} [opt] options, { lockWrite: true } if manually calling lockWrite
      * @return {Iterable}
      */
-    *keys() {
-        for (let pos of this._keys()) {
+    *keys(opt) {
+        const lockHeld = opt && (opt.lockWrite || opt.lockExclusive);
+        for (let pos of this._keys(lockHeld)) {
             const k = this._decodeKey(pos);
-            this._unlockLine(pos);
-            this._unlockSharedRead();
+            lockHeld || this._unlockLine(pos);
+            lockHeld || this._unlockSharedRead();
             yield k;
         }
     }
 
     /**
-     * @callback mapCallback callback(currentValue[, key[, map]] )}
+     * @callback mapCallback callback(currentValue[, key] )}
      * map.get(key)=currentValue is guaranteed while the callback runs,
-     * Manipulation of the SharedMap in the callback must be limited to get/has
-     * 
+     * You shall not manipulate the map in the callback, use an explicitly-locked
+     * keys() in this case (look at the examples in the README.md)
+     *
      * @param {string} currentValue
-     * @param {string} key
-     * @param {SharedMap} map
+     * @param {string} [key]
      */
 
     /**
      * A thread-safe map(). Doesn't block additions or deletions
      * between two calls of the callback,
+     * all map operations are guaranteed atomic,
      * map.get(index)=currentValue is guaranteed while the callback runs,
-     * Manipulation of the SharedMap in the callback must be limited to get/has
-     * 
-     * @param thisArg callback will have its this set to thisArg
+     * You shall not manipulate the map in the callback, use an explicitly-locked
+     * keys() in this case (look at the examples in the README.md)
+     *
+     * @param {mapCallback} cb callback
+     * @param {*} [thisArg] callback will have its this set to thisArg
      * @return {Array}
      */
     map(cb, thisArg) {
@@ -587,7 +610,7 @@ class SharedMap {
             const k = this._decodeKey(pos);
             const v = this._decodeValue(pos);
             try {
-                a.push(cb.call(thisArg, v, k, this));
+                a.push(cb.call(thisArg, v, k));
                 this._unlockLine(pos);
                 this._unlockSharedRead();
             } catch (e) {
@@ -600,25 +623,27 @@ class SharedMap {
     }
 
     /**
-     * @callback reduceCallback callback(accumulator, currentValue[, key[, map]] )}
+     * @callback reduceCallback callback(accumulator, currentValue[, key] )}
+     * all map operations are guaranteed atomic,
      * map.get(key)=currentValue is guaranteed while the callback runs,
-     * Manipulation of the SharedMap in the callback must be limited to get/has
+     * You shall not manipulate the map in the callback, use an explicitly-locked
+     * keys() in this case (look at the examples in the README.md)
      * 
      * @param accumulator
      * @param {string} currentValue
-     * @param {string} key
-     * @param {SharedMap} map
+     * @param {string} [key]
      */
 
     /**
      * A thread-safe reduce(). Doesn't block additions or deletions
      * between two calls of the callback,
      * map.get(key)=currentValue is guaranteed while the callback runs,
-     * Manipulation of the SharedMap in the callback must be limited to get/has
+     * You shall not manipulate the map in the callback, use an explicitly-locked
+     * keys() in this case (look at the examples in the README.md)
      * 
      * @param {reduceCallback} cb callback
-     * @param initialValue initial value of the accumulator
-     * @return {Object}
+     * @param {*} initialValue initial value of the accumulator
+     * @return {*}
      */
     reduce(cb, initialValue) {
         let a = initialValue;
@@ -626,7 +651,7 @@ class SharedMap {
             const k = this._decodeKey(pos);
             const v = this._decodeValue(pos);
             try {
-                a = cb(a, v, k, this);
+                a = cb(a, v, k);
                 this._unlockLine(pos);
                 this._unlockSharedRead();
             } catch (e) {

@@ -14,16 +14,28 @@ function testMap(map, mypart, parts, out) {
     const t0 = Date.now();
     for (let pass = 0; pass < PASSES; pass++) {
         out(`t: ${mypart} pass ${pass} of ${PASSES}`);
+        /**
+         * Test 1: Interleaved write
+         */
         for (let i = mypart; i < words.length; i += parts) {
             map.set(words[i], i);
         }
         out(`t: ${mypart} ${map.length}/${map.size} elements in map`);
 
+        /**
+         * Test 2: Interleaved read of all words written during Test 1
+         */
         for (let i = mypart; i < words.length; i += parts) {
             const v = map.get(words[i]);
             if (+v != i)
                 throw new Error(`value mismatch ${words[i]} ${i} != ${+v}`);
         }
+
+        /**
+         * Test 3: Reading of all words, including those written by other threads
+         * Some could have been deleted during Test 4, but those present should
+         * have correct values
+         */
         for (let i = mypart; i < words.length; i++) {
             const v = map.get(words[i]);
             if (v !== undefined && +v != i)
@@ -31,11 +43,19 @@ function testMap(map, mypart, parts, out) {
         }
         out(`t: ${mypart} ${map.length}/${map.size} elements in map`);
 
+        /**
+         * Test 4: Interleaved delete of 1/4th of all words
+         */
         for (let i = mypart; i < words.length; i += 4 * parts) {
             map.delete(words[i]);
         }
         out(`t: ${mypart} ${map.length}/${map.size} elements in map`);
 
+        /**
+         * Test 5: Interleaved reading of all words, verifying that
+         * words written in Test 1 are still there and words deleted
+         * in Test 4 are missing
+         */
         for (let i = mypart; i < words.length; i += parts) {
             if (i % (parts * 4) === mypart) {
                 if (map.has(words[i]))
@@ -48,6 +68,10 @@ function testMap(map, mypart, parts, out) {
         }
         out(`t: ${mypart} ${map.length}/${map.size} elements in map`);
 
+        /**
+         * Test 6: Unlocked iteration of all keys
+         * Values can disappear at any moment
+         */
         let c = 0;
         for (let i of map.keys())
             if (map.get(i) === undefined)
@@ -56,19 +80,38 @@ function testMap(map, mypart, parts, out) {
                 c++;
         out(`t: ${mypart} ${map.length}/${map.size} elements in map, counted ${c}`);
 
+        /**
+         * Test 7: Explicitly locked iteration of all keys
+         * Rewriting values with opt.lockWrite=true
+         */
         c = 0;
         let c2 = 0;
         map.lockWrite();
-        for (let i of map.keys())
-            if (map.get(i) === undefined)
+        for (let i of map.keys({ lockWrite: true })) {
+            const v = +map.get(i, { lockWrite: true });
+            if (v === undefined)
                 throw new Error(`value ${i} deleted under our nose`);
             else
                 c++;
+            map.set(i, v, {lockWrite: true});
+        }
+
+        /**
+         * Test 8: Locked reduce, count should be exact
+         * !--reduce with explicit locking is not officialy supported--!
+         */
         c2 = map.reduce((a) => a + 1, 0);
         if (c2 !== c)
             throw new Error(`counted ${c} != ${c2}`);
         out(`t: ${mypart} with writeLock ${map.length}/${map.size} elements in map, counted ${c} == ${c2}`);
         map.unlockWrite();
+
+        /**
+         * Test 9: Unlocked reduce, count is potentially false
+         * by the time we are finished
+         */
+        c2 = map.reduce((a) => a + 1, 0);
+        out(`t: ${mypart} unlocked reduce ${map.length}/${map.size} elements in map, counted ${c2}`);
     }
     const ops = map.stats.get + map.stats.set + map.stats.delete;
     const t = Date.now() - t0;

@@ -2,6 +2,7 @@
 
  * ***zero-dependency***
  * high-performance
+ * unordered
  * Vanilla JS implementation of SharedMap,
  * a synchronous multi-threading capable,
  * fine-grain-locked with deadlock recovery,
@@ -17,7 +18,7 @@
 Due to its legacy as a simple Web page glue, JS has what is probably the absolutely worst support of multi-threading among all languages created in the last few decades.
 
 As the language matures, driven by a remarkably well implemented engine (V8) and the unique promise of unifying back-end, front-end and desktop application development, real multi-threading for CPU-bound tasks is becoming an absolute necessity.
-In a true JS spirit, a feature after feature is added, some projects implementing it, others boycotting it, leaving it to the crowd to eventually decide what is worth supporting and what is not. As much as this can appear appalling to computer language experts, it is in a quite a way reminiscent of how the Linux kernel imposted itself vs the tech giants 20 years ago, and this is how JS is today on its way to total dominance as the leading general-purpose language.
+In a true JS spirit, a feature after feature is added, some projects implementing it, others boycotting it, leaving it to the crowd to eventually decide what is worth supporting and what is not. As much as this can appear appalling to computer language experts, it is in a quite a way reminiscent of how the Linux kernel imposed itself vs the tech giants 20 years ago, and this is how JS is today on its way to total dominance as the leading general-purpose language.
 
 The current situation with **SharedArrayBuffer** is a perfect example of this JS spirit. In the hope that at some point in the near future Firefox will re-enable it by default, and Safari will implement it, **SharedMap** is proposed as a working solution for computationally-heavy back-end programs executing in Node.js.
 
@@ -48,7 +49,7 @@ There are also thread-safe implementations of *map()* and *reduce()* and a publi
 npm install sharedmap
 ```
 
-## Usage
+## Usage examples
 ```js
 const SharedMap = require('SharedMap');
 
@@ -87,13 +88,23 @@ if (workerThreads.isMainThread) {
         console.assert(myMap.has(k));               // will never fail, but locks out writers
     myMap.unlockWrite();
 
-    const sum = map.reduce((a, x) => a += (+x), 0); // Both are thread-safe without lock, but there could 
-    const allKeys = Array.from(myMap.keys());       // be values added/deleted while the operation runs
+    // Both are thread-safe without lock, but there could
+    // be values added/deleted/modified while the operation runs
+    // These operations will be atomic, so all values read will be coherent
+    const sum = map.reduce((a, x) => a += (+x), 0);
+    const allKeys = Array.from(myMap.keys());
 
-    // get & has in the callback are allowed, set & delete are not
     // map.get(key)=currentValue is guaranteed while the callback runs
-    const sum2 = map.reduce((a, x, i) => a += (+map.get(i)), 0); 
+    const sum2 = map.reduce((a, x, i) => a += (+map.get('some other element')), 0);
 
+    // Update with explicit locking
+    // Other threads can continue reading, set operations will be atomic
+    // In real-life you will also handle the exceptions
+    myMap.lockWrite();
+    for (let k of myMap.keys({lockWrite: true}))
+        myMap.set(k, myMap.get(k, {lockWrite: true}).toUpperCase(), {lockWrite: true});
+    myMap.unlockWrite();
+    
     myMap.clear();
 }
 ```
