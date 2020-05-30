@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node --experimental-worker test",
     "c8": "node_modules/.bin/c8 node test",
+    "lcov": "node_modules/.bin/c8 report --reporter=text-lcov > coverage/tests.lcov",
     "codecov": "curl -s https://codecov.io/bash | env CODECOV_TOKEN='bd348e30-1f23-4e2e-8d31-684e83362e6c' bash",
     "preversion": "npm test && eslint index.js test.js",
     "minify": "terser index.js -o index.min.js",

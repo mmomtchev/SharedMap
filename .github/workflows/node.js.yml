@@ -45,4 +45,5 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm i c8
     - run: npm run c8
+    - run: npm run lcov
     - run: npm run codecov

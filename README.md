@@ -15,6 +15,7 @@
 
  [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
  [![Node.js CI](https://github.com/mmomtchev/SharedMap/workflows/Node.js%20CI/badge.svg)](https://github.com/mmomtchev/SharedMap/actions?query=workflow%3A%22Node.js+CI%22)
+ [![codecov](https://codecov.io/gh/mmomtchev/SharedMap/branch/master/graph/badge.svg)](https://codecov.io/gh/mmomtchev/SharedMap)
 
 ## Introduction
 
