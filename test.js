@@ -4,7 +4,7 @@ const SharedMap = require('./index');
 const dict = require('./words_dictionary.json');
 const words = Object.keys(dict);
 
-const MAPSIZE = Math.floor(words.length * 1.05);
+const MAPSIZE = Math.floor(words.length * 1.01);
 const KEYSIZE = 48;
 const OBJSIZE = 16;
 const NWORKERS = require('os').cpus().length;
