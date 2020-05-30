@@ -303,8 +303,7 @@ class SharedMap {
         process.exit(1);
     }
 
-    _write(pos, key, value, exclusive) {
-        const buckets = Math.ceil(value.length / this.meta[META.objSize]);
+    _write(pos, key, value) {
         let i;
         for (i = 0; i < key.length; i++)
             this.keysData[pos * this.meta[META.keySize] + i] = key.charCodeAt(i);
@@ -357,7 +356,7 @@ class SharedMap {
             if (Atomics.load(this.meta, META.length) === this.meta[META.maxSize])
                 throw new RangeError('SharedMap is full');
             /* Copy the element into place, chaining when needed */
-            this._write(pos, key, value, exclusive);
+            this._write(pos, key, value);
             this.chaining[pos] = UINT32_UNDEFINED;
             /* Use Atomics to increase the length, we do not hold an exclusive lock here */
             Atomics.add(this.meta, META.length, 1);

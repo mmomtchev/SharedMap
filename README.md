@@ -13,6 +13,8 @@
  * and is capable of auto-defragmenting itself on delete unless almost full
  * compatible with both Node.js and SharedArrayBuffer-enabled browsers
 
+ [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+
 ## Introduction
 
 Due to its legacy as a simple Web page glue, JS has what is probably the absolutely worst support of multi-threading among all languages created in the last few decades.

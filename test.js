@@ -8,7 +8,7 @@ const MAPSIZE = Math.floor(words.length * 1.05);
 const KEYSIZE = 48;
 const OBJSIZE = 16;
 const NWORKERS = require('os').cpus().length;
-const PASSES = 4;
+const PASSES = 64;
 
 function testMap(map, mypart, parts, out) {
     const t0 = Date.now();
