@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "node --experimental-worker test",
+    "c8": "node_modules/.bin/c8 node test",
+    "codecov": "CODECOV_TOKEN='bd348e30-1f23-4e2e-8d31-684e83362e6c' bash <(curl -s https://codecov.io/bash)",
     "preversion": "npm test && eslint index.js test.js",
     "minify": "terser index.js -o index.min.js",
     "doc": "jsdoc index.js README.md -d docs",
