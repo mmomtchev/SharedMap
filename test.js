@@ -119,6 +119,15 @@ function testMap(map, mypart, parts, out) {
 }
 
 if (workerThreads.isMainThread) {
+    try {
+        const mySmallMap = new SharedMap(4, KEYSIZE, OBJSIZE);
+        for (let i = 0; i < 5; i++)
+            mySmallMap.set('test' + i, i);
+        throw new Error('no overflow exception');
+    } catch (e) {
+        if (!(e instanceof RangeError))
+            throw e;
+    }
     const myMap = new SharedMap(MAPSIZE, KEYSIZE, OBJSIZE);
     myMap.set('test', 2);
     myMap.set('test', 1);
@@ -185,7 +194,7 @@ if (workerThreads.isMainThread) {
     /* This needs a more elegant way of doing it
      * https://github.com/nodejs/help/issues/1558
      */
-    myMap.__proto__ = SharedMap.prototype;
+    Object.setPrototypeOf(myMap, SharedMap.prototype);
 
     testMap(myMap, +workerThreads.workerData.part, +workerThreads.workerData.parts,
         workerThreads.parentPort.postMessage.bind(workerThreads.parentPort));

@@ -144,6 +144,9 @@ class SharedMap {
     }
 
     /* eslint-disable no-constant-condition */
+    /**
+     * @private
+     */
     _lock(l) {
         while (true) {
             let state;
@@ -154,6 +157,9 @@ class SharedMap {
         }
     }
 
+    /**
+     * @private
+     */
     _unlock(l) {
         const state = Atomics.exchange(this.maplock, l, 0);
         if (state == 0)
@@ -161,6 +167,9 @@ class SharedMap {
         Atomics.notify(this.maplock, l);
     }
 
+    /**
+     * @private
+     */
     _lockLine(pos) {
         const bitmask = 1 << (pos % 32);
         const index = Math.floor(pos / 32);
@@ -173,6 +182,9 @@ class SharedMap {
     }
     /* eslint-enable no-constant-condition */
 
+    /**
+     * @private
+     */
     _unlockLine(pos) {
         const bitmask = 1 << (pos % 32);
         const notbitmask = (~bitmask) & UINT32_MAX;
@@ -183,6 +195,9 @@ class SharedMap {
         Atomics.notify(this.linelocks, index);
     }
 
+    /**
+     * @private
+     */
     _lockLineSliding(oldLock, newLock) {
         if (newLock <= oldLock)
             throw new Deadlock();
@@ -210,6 +225,9 @@ class SharedMap {
         this._unlock(LOCK.READLOCK);
     }
 
+    /**
+     * @private
+     */
     _lockSharedRead() {
         this._lock(LOCK.SHAREDREAD);
         if (++this.maplock[LOCK.READERS] == 1)
@@ -217,6 +235,9 @@ class SharedMap {
         this._unlock(LOCK.SHAREDREAD);
     }
 
+    /**
+     * @private
+     */
     _unlockSharedRead() {
         this._lock(LOCK.SHAREDREAD);
         if (--this.maplock[LOCK.READERS] == 0)
@@ -224,6 +245,9 @@ class SharedMap {
         this._unlock(LOCK.SHAREDREAD);
     }
 
+    /**
+     * @private
+     */
     _lockSharedWrite() {
         this._lockSharedRead();
         this._lock(LOCK.SHAREDWRITE);
@@ -232,7 +256,10 @@ class SharedMap {
         this._unlock(LOCK.SHAREDWRITE);
     }
 
-    _unlockSharedWrite() {
+     /**
+     * @private
+     */
+   _unlockSharedWrite() {
         this._lock(LOCK.SHAREDWRITE);
         if (--this.maplock[LOCK.WRITERS] == 0)
             this._unlock(LOCK.WRITELOCK);
@@ -268,6 +295,9 @@ class SharedMap {
         this._unlockSharedRead();
     }
 
+    /**
+     * @private
+     */
     _match(key, pos) {
         let i;
         for (i = 0; i < key.length; i++)
@@ -276,20 +306,29 @@ class SharedMap {
         return i === key.length && this.keysData[pos * this.meta[META.keySize] + i] === 0;
     }
 
+    /**
+     * @private
+     */
     _decodeValue(pos) {
         const eos = this.valuesData.subarray(pos * this.meta[META.objSize], (pos + 1) * this.meta[META.objSize]).findIndex(x => x === 0);
         const end = eos < 0 ? (pos + 1) * this.meta[META.objSize] : pos * this.meta[META.objSize] + eos;
         return String.fromCharCode.apply(null, this.valuesData.subarray(pos * this.meta[META.objSize], end));
     }
 
+    /**
+     * @private
+     */
     _decodeKey(pos) {
         const eos = this.keysData.subarray(pos * this.meta[META.keySize], (pos + 1) * this.meta[META.keySize]).findIndex(x => x === 0);
         const end = eos < 0 ? (pos + 1) * this.meta[META.keySize] : pos * this.meta[META.keySize] + eos;
         return String.fromCharCode.apply(null, this.keysData.subarray(pos * this.meta[META.keySize], end));
     }
 
-    /* These are debugging aids */
-    /* c8 ignore next 8 */
+    /**
+     * These two are debugging aids
+     * c8 ignore next 8
+     * @private
+     */
     _decodeBucket(pos, n) {
         return `pos: ${pos}`
             + ` hash: ${this._hash(this._decodeKey(pos))}`
@@ -298,13 +337,19 @@ class SharedMap {
             + ` chain: ${this.chaining[pos]}`
             + ((n > 0 && this.chaining[pos] !== UINT32_UNDEFINED) ? '\n' + (this._decodeBucket(this.chaining[pos], n - 1)) : '');
     }
-    /* c8 ignore next 5 */
+    /**
+     * c8 ignore next 5
+     * @private
+     */
     __printMap() {
         for (let i = 0; i < this.meta[META.maxSize]; i++)
             console.log(this._decodeBucket(i, 0));
         process.exit(1);
     }
 
+    /**
+     * @private
+     */
     _write(pos, key, value) {
         let i;
         for (i = 0; i < key.length; i++)
@@ -316,14 +361,15 @@ class SharedMap {
     }
 
     /**
-    * @typedef SharedMapOptions
-    * @type {object}
-    * @property {boolean} lockWrite Already holding write lock, useful when manually locking with lockWrite
-    * @property {boolean} lockExclusive Already holding exclusive lock, useful when manually locking with lockExclusive
-    */
+     * @private
+     */
     _set(key, value, exclusive) {
         /* Hash */
         let pos = this._hash(key);
+        /* Check for full table condition */
+        if (Atomics.load(this.meta, META.length) === this.meta[META.maxSize])
+            if (!this._find(key, exclusive))
+                throw new RangeError('SharedMap is full');
         /* Find the first free bucket, remembering the last occupied one to chain it */
         let toChain;
         let slidingLock;
@@ -355,8 +401,6 @@ class SharedMap {
                     exclusive || (slidingLock = this._lockLineSliding(slidingLock, pos));
                 }
             }
-            if (Atomics.load(this.meta, META.length) === this.meta[META.maxSize])
-                throw new RangeError('SharedMap is full');
             /* Copy the element into place, chaining when needed */
             this._write(pos, key, value);
             this.chaining[pos] = UINT32_UNDEFINED;
@@ -377,6 +421,13 @@ class SharedMap {
             throw e;
         }
     }
+
+    /**
+    * @typedef SharedMapOptions
+    * @type {object}
+    * @property {boolean} lockWrite Already holding write lock, useful when manually locking with lockWrite
+    * @property {boolean} lockExclusive Already holding exclusive lock, useful when manually locking with lockExclusive
+    */
 
     /**
      * Add/replace an element, fully thread-safe, multiple get/set can execute in parallel
@@ -423,6 +474,9 @@ class SharedMap {
         }
     }
 
+    /**
+     * @private
+     */
     _find(key, exclusive) {
         let slidingLock;
         try {
@@ -497,6 +551,9 @@ class SharedMap {
         return this.get(key, opt) !== undefined;
     }
 
+    /**
+     * @private
+     */
     _hash(s) {
         if (typeof s.hash === 'function')
             return s.hash(s) % this.meta[META.maxSize];
@@ -564,6 +621,9 @@ class SharedMap {
         lockHeld || this.unlockExclusive();
     }
 
+    /**
+     * @private
+     */
     *_keys(exclusive) {
         for (let pos = 0; pos < this.meta[META.maxSize]; pos++) {
             exclusive || this._lockSharedRead();
