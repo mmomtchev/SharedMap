@@ -326,9 +326,9 @@ class SharedMap {
 
     /**
      * These two are debugging aids
-     * c8 ignore next 10
      * @private
      */
+    /* c8 ignore next 8 */
     _decodeBucket(pos, n) {
         return `pos: ${pos}`
             + ` hash: ${this._hash(this._decodeKey(pos))}`
@@ -338,9 +338,9 @@ class SharedMap {
             + ((n > 0 && this.chaining[pos] !== UINT32_UNDEFINED) ? '\n' + (this._decodeBucket(this.chaining[pos], n - 1)) : '');
     }
     /**
-     * c8 ignore next 7
      * @private
      */
+    /* c8 ignore next 5 */
     __printMap() {
         for (let i = 0; i < this.meta[META.maxSize]; i++)
             console.log(this._decodeBucket(i, 0));
