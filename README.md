@@ -75,7 +75,7 @@ if (workerThreads.isMainThread) {
     const myMap = workerThreads.workerData.map;
 
     // You have to manually restore the prototype
-    myMap.__proto__ = SharedMap.prototype;
+    Object.setPrototypeOf(myMap, SharedMap.prototype);
 
     myMap.set('prop1', 'val1');
     myMap.set('prop2', 12);
