@@ -326,7 +326,7 @@ class SharedMap {
 
     /**
      * These two are debugging aids
-     * c8 ignore next 8
+     * c8 ignore next 10
      * @private
      */
     _decodeBucket(pos, n) {
@@ -338,7 +338,7 @@ class SharedMap {
             + ((n > 0 && this.chaining[pos] !== UINT32_UNDEFINED) ? '\n' + (this._decodeBucket(this.chaining[pos], n - 1)) : '');
     }
     /**
-     * c8 ignore next 5
+     * c8 ignore next 7
      * @private
      */
     __printMap() {
