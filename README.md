@@ -28,7 +28,7 @@ The current situation with **SharedArrayBuffer** is a perfect example of this JS
 
 **SharedMap** is browser-compatible in theory, but on the front-end side, when one of the major browsers is completely missing (*Safari*), and another one requires the user to go through a security warning to enable an obscure feature (*Firefox*), its usefulness will be severely limited. For this reason I haven't even bothered to include an ES Modules interface, but you are free to try it in your Chrome/Edge-exclusive project.
 
-**SharedMap** was motivated by [igc-xc-score](https://github.com/mmomtchev/igc-xc-score), a linear optimization solver for scoring paragliding flights. When I started it, I initially tried Python because of its flawless multi-threading and then I slowly realized that the single-threaded V8 implementation was faster then the 4-way multi-threaded Python3 (and PyPy) implementation. Love it or hate it, JS is here to stay for the years to come.
+**SharedMap** was motivated by [igc-xc-score](https://github.com/mmomtchev/igc-xc-score), a linear optimization solver for scoring paragliding flights. When I started it, I initially tried Python because of its flawless multi-threading and then I slowly realized that the single-threaded V8 implementation was faster than the 4-way multi-threaded Python3 (and PyPy) implementation. Love it or hate it, JS is here to stay for the years to come.
 
 ## About
 
