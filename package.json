@@ -1,17 +1,21 @@
 {
   "name": "sharedmap",
-  "version": "1.1.1",
+  "version": "1.2.0-git",
   "description": "Multithreading-compatible SharedMap in vanilla JS",
-  "main": "index.js",
+  "main": "index.umd.js",
+  "module": "index.es.js",
   "scripts": {
     "test": "node --experimental-worker test",
     "c8": "node_modules/.bin/c8 node test",
     "lcov": "node_modules/.bin/c8 report --reporter=text-lcov > coverage/tests.lcov",
     "codecov": "curl -s https://codecov.io/bash | env CODECOV_TOKEN='bd348e30-1f23-4e2e-8d31-684e83362e6c' bash",
+    "build:umd": "node_modules/.bin/rollup -i index.js -f umd -o index.umd.js --output.name=default",
+    "build:es": "node_modules/.bin/rollup -i index.js -f es -o index.es.js",
+    "build": "npm run build:umd && npm run build:es",
     "preversion": "npm test && eslint index.js test.js",
     "minify": "terser index.js -o index.min.js",
     "doc": "jsdoc index.js README.md -d docs",
-    "version": "npm run minify && npm run doc && git add package.json index.min.js docs",
+    "version": "npm run build && npm run doc && git add package.json index.umd.js index.es.js docs",
     "postversion": "git push && git push --tags"
   },
   "repository": {
@@ -31,5 +35,8 @@
   "bugs": {
     "url": "https://github.com/mmomtchev/SharedMap/issues"
   },
-  "homepage": "https://github.com/mmomtchev/SharedMap#readme"
+  "homepage": "https://github.com/mmomtchev/SharedMap#readme",
+  "devDependencies": {
+    "rollup": "^2.17.0"
+  }
 }

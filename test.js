@@ -1,5 +1,5 @@
 const workerThreads = require('worker_threads');
-const SharedMap = require('./index');
+const SharedMap = require('./index.umd');
 
 const dict = require('./words_dictionary.json');
 const words = Object.keys(dict);

@@ -26,7 +26,7 @@ In a true JS spirit, a feature after feature is added, some projects implementin
 
 The current situation with **SharedArrayBuffer** is a perfect example of this JS spirit. In the hope that at some point in the near future Firefox will re-enable it by default, and Safari will implement it, **SharedMap** is proposed as a working solution for computationally-heavy back-end programs executing in Node.js.
 
-**SharedMap** is browser-compatible in theory, but on the front-end side, when one of the major browsers is completely missing (*Safari*), and another one requires the user to go through a security warning to enable an obscure feature (*Firefox*), its usefulness will be severely limited. For this reason I haven't even bothered to include an ES Modules interface, but you are free to try it in your Chrome/Edge-exclusive project.
+**SharedMap** is browser-compatible in theory, but on the front-end side, when one of the major browsers is completely missing (*Safari*), and another one requires the user to go through a security warning to enable an obscure feature (*Firefox*), its usefulness will be severely limited. An ES Module interface is provided and also TS definitions courtesy of [@takase1121](https://github.com/takase1121), so feel free to try it in your Chrome/Edge-exclusive project.
 
 **SharedMap** was motivated by [igc-xc-score](https://github.com/mmomtchev/igc-xc-score), a linear optimization solver for scoring paragliding flights. When I started it, I initially tried Python because of its flawless multi-threading and then I slowly realized that the single-threaded V8 implementation was faster than the 4-way multi-threaded Python3 (and PyPy) implementation. Love it or hate it, JS is here to stay for the years to come.
 

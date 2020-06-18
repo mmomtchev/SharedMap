@@ -1,4 +1,3 @@
-'use strict';
 const UINT32_MAX = 0xFFFFFFFF;
 const UINT32_UNDEFINED = 0xFFFFFFFF;
 
@@ -85,7 +84,7 @@ class Deadlock extends Error {
  * @author Momtchil Momtchev <momtchil@momtchev.com>
  * @see http://github.com/mmomtchev/SharedMap
  */
-export class SharedMap {
+class SharedMap {
     /**
      * Creates a new SharedMap
      * @param {number} maxSize - Maximum number of entries
@@ -748,3 +747,5 @@ export class SharedMap {
 }
 
 module.exports = SharedMap;
+
+export { SharedMap };
