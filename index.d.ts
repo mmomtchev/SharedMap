@@ -6,7 +6,7 @@ declare module 'sharedmap' {
         lockExclusive: boolean;
     }
 
-    export class sharedMap {
+    export class SharedMap {
         constructor(maxSize: number, keySize: number, objSize: number);
         
         get length(): number;
