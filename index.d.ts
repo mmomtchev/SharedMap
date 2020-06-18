@@ -26,7 +26,7 @@ declare module 'sharedmap' {
 
         *keys(options: SharedMapOptions): Iterable<string>;
         
-        map(cb: (currentValue: string, key?: string) => string, thisArg: unknown): string[];
-        reduce(cb: (accumulator: U, currentValue: string, key: string) => U, initialValue: U);
+        map(cb: (currentValue: string, key?: string) => T, thisArg: unknown): T[];
+        reduce(cb: (accumulator: T, currentValue: string, key: string) => T, initialValue: T);
     }
 }
