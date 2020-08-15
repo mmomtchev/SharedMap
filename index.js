@@ -85,7 +85,7 @@ class Deadlock extends Error {
  * @author Momtchil Momtchev <momtchil@momtchev.com>
  * @see http://github.com/mmomtchev/SharedMap
  */
-export class SharedMap {
+export default class SharedMap {
     /**
      * Creates a new SharedMap
      * @param {number} maxSize - Maximum number of entries
@@ -344,7 +344,7 @@ export class SharedMap {
     __printMap() {
         for (let i = 0; i < this.meta[META.maxSize]; i++)
             console.log(this._decodeBucket(i, 0));
-        process.exit(1);
+        if (typeof process !== 'undefined') process.exit(1);
     }
 
     /**
@@ -746,5 +746,3 @@ export class SharedMap {
         this.unlockExclusive();
     }
 }
-
-module.exports = SharedMap;

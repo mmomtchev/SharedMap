@@ -343,7 +343,7 @@ class SharedMap {
     __printMap() {
         for (let i = 0; i < this.meta[META.maxSize]; i++)
             console.log(this._decodeBucket(i, 0));
-        process.exit(1);
+        if (typeof process !== 'undefined') process.exit(1);
     }
 
     /**
@@ -746,6 +746,4 @@ class SharedMap {
     }
 }
 
-module.exports = SharedMap;
-
-export { SharedMap };
+export default SharedMap;

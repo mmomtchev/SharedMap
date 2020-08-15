@@ -13,7 +13,7 @@
     "build:umd": "node_modules/.bin/rollup -i index.js -f umd -o index.umd.js --output.name=default",
     "build:es": "node_modules/.bin/rollup -i index.js -f es -o index.es.js",
     "build": "npm run build:umd && npm run build:es",
-    "preversion": "npm test && eslint index.js test.js",
+    "preversion": "npm test && eslint index.js test.js index.es.js index.umd.js",
     "minify": "terser index.js -o index.min.js",
     "doc": "jsdoc index.js README.md -d docs",
     "version": "npm run build && npm run doc && git add package.json index.umd.js index.es.js docs",
@@ -38,6 +38,7 @@
   },
   "homepage": "https://github.com/mmomtchev/SharedMap#readme",
   "devDependencies": {
+    "eslint": "^7.7.0",
     "rollup": "^2.17.0"
   }
 }

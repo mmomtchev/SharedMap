@@ -1,8 +1,8 @@
 (function (global, factory) {
-   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-   typeof define === 'function' && define.amd ? define(['exports'], factory) :
-   (global = global || self, factory(global.default = {}));
-}(this, (function (exports) { 'use strict';
+   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+   typeof define === 'function' && define.amd ? define(factory) :
+   (global = global || self, global.default = factory());
+}(this, (function () { 'use strict';
 
    const UINT32_MAX = 0xFFFFFFFF;
    const UINT32_UNDEFINED = 0xFFFFFFFF;
@@ -349,7 +349,7 @@
        __printMap() {
            for (let i = 0; i < this.meta[META.maxSize]; i++)
                console.log(this._decodeBucket(i, 0));
-           process.exit(1);
+           if (typeof process !== 'undefined') process.exit(1);
        }
 
        /**
@@ -752,10 +752,6 @@
        }
    }
 
-   module.exports = SharedMap;
-
-   exports.SharedMap = SharedMap;
-
-   Object.defineProperty(exports, '__esModule', { value: true });
+   return SharedMap;
 
 })));
