@@ -4,6 +4,7 @@
   "description": "Multithreading-compatible SharedMap in vanilla JS",
   "main": "index.umd.js",
   "module": "index.es.js",
+  "typings": "index.d.ts",
   "scripts": {
     "test": "node --experimental-worker test",
     "c8": "node_modules/.bin/c8 node test",
