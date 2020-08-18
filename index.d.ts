@@ -17,16 +17,16 @@ declare module 'sharedmap' {
         lockWrite(): void;
         unlockWrite(): void;
 
-        set(key: string, value: string | number, options: SharedMapOptions): void;
-        get(key: string, options: SharedMapOptions): string?;
+        set(key: string, value: string | number, options?: SharedMapOptions): void;
+        get(key: string, options?: SharedMapOptions): string?;
 
-        has(key: string, options: SharedMapOptions): boolean;
-        delete(key: string, options: SharedMapOptions): void;
+        has(key: string, options?: SharedMapOptions): boolean;
+        delete(key: string, options?: SharedMapOptions): void;
         clear(): void;
 
-        *keys(options: SharedMapOptions): Iterable<string>;
+        *keys(options?: SharedMapOptions): Iterable<string>;
         
-        map(cb: (currentValue: string, key?: string) => T, thisArg: unknown): T[];
+        map(cb: (currentValue: string, key?: string) => T, thisArg?: unknown): T[];
         reduce(cb: (accumulator: T, currentValue: string, key: string) => T, initialValue: T);
     }
 }
