@@ -379,8 +379,10 @@ export default class SharedMap {
                 this.stats.collisions++;
                 /* Replacing existing key */
                 if (this._match(key, pos)) {
-                    for (let i = 0; i < value.length; i++)
+                    let i;
+                    for (i = 0; i < value.length; i++)
                         this.valuesData[pos * this.meta[META.objSize] + i] = value.charCodeAt(i);
+                    this.valuesData[pos * this.meta[META.objSize] + i] = 0;
                     exclusive || this._unlockLine(slidingLock);
                     return;
                 }
