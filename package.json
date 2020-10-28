@@ -1,6 +1,6 @@
 {
   "name": "sharedmap",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Multithreading-compatible SharedMap in vanilla JS",
   "main": "index.umd.js",
   "module": "index.es.js",
@@ -38,6 +38,7 @@
   },
   "homepage": "https://github.com/mmomtchev/SharedMap#readme",
   "devDependencies": {
+    "chai": "^4.2.0",
     "eslint": "^7.7.0",
     "jsdoc": "^3.6.5",
     "rollup": "^2.17.0"

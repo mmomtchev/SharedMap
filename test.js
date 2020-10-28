@@ -1,3 +1,6 @@
+const chai = require('chai');
+const should = chai.should();
+
 const workerThreads = require('worker_threads');
 const SharedMap = require('./index.umd');
 
@@ -119,47 +122,38 @@ function testMap(map, mypart, parts, out) {
 }
 
 if (workerThreads.isMainThread) {
-    try {
+    (() => {
         const mySmallMap = new SharedMap(4, KEYSIZE, OBJSIZE);
         for (let i = 0; i < 5; i++)
             mySmallMap.set('test' + i, i);
-        throw new Error('no overflow exception');
-    } catch (e) {
-        if (!(e instanceof RangeError))
-            throw e;
-    }
+    }).should.throw(RangeError);
+
     const myMap = new SharedMap(MAPSIZE, KEYSIZE, OBJSIZE);
     myMap.set('test', 2);
     myMap.set('test', 1);
     myMap.set('test2', 3);
     const mmap = myMap.map((v, k) => ({ k, v }));
     const accu = myMap.reduce((a, x) => a + (+x), 0);
-    console.assert(mmap.length === 2);
-    console.assert(myMap.get('test') === '1');
-    console.assert(accu === 4);
+    mmap.length.should.equal(2);
+    myMap.get('test').should.equal('1');
+    accu.should.equal(4);
+
     myMap.clear();
-    console.assert(!myMap.has('test') && myMap.length === 0 && myMap.get('test') === undefined);
-    try {
+    myMap.has('test').should.equal(false);
+    myMap.length.should.equal(0);
+    should.equal(myMap.get('test'), undefined);
+
+
+    (() => {
         myMap.delete('nonexisting');
-        throw new Error('delete nonexisting succeeded');
-    } catch (e) {
-        if (!(e instanceof RangeError))
-            throw e;
-    }
-    try {
+    }).should.throw(RangeError);
+    (() => {
         myMap.set('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'b');
-        throw new Error('insert oversized key');
-    } catch (e) {
-        if (!(e instanceof RangeError))
-            throw e;
-    }
-    try {
+    }).should.throw(RangeError);
+    (() => {
         myMap.set('b', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-        throw new Error('insert oversized value');
-    } catch (e) {
-        if (!(e instanceof RangeError))
-            throw e;
-    }
+    }).should.throw(RangeError);
+
     const workers = new Array(NWORKERS).fill(undefined);
     for (let w in workers) {
         workers[w] = new workerThreads.Worker('./test.js', { workerData: { map: myMap, part: w, parts: NWORKERS } });
@@ -181,11 +175,9 @@ if (workerThreads.isMainThread) {
                 }
                 console.log('all finished, checking consistency');
                 const wordsDeleted = Math.ceil(Math.ceil(words.length / 4) / NWORKERS) * NWORKERS;
-                if (myMap.length !== words.length - wordsDeleted)
-                    throw new Error('wrong amount of values ' + myMap.length + ' should be ' + (words.length - wordsDeleted));
+                myMap.length.should.equal(words.length - wordsDeleted);
                 for (let k of myMap.keys())
-                    if (myMap.get(k) === undefined)
-                        throw new Error('missing values');
+                    myMap.get(k).should.not.be.a('undefined');
             }
         });
     }
