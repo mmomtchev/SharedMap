@@ -37,7 +37,8 @@ function _hash(str) {
     h ^= h >>> 13;
     h = (((h & 0xffff) * 0x5bd1e995) + ((((h >>> 16) * 0x5bd1e995) & 0xffff) << 16));
     h ^= h >>> 15;
-    return h >>> 0;
+    h = h >>> 0;
+    return (h != UINT32_UNDEFINED) ? h : 1;
 }
 
 function align32(v) {

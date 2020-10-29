@@ -9,12 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
  - Rewrite the unit tests around chai
+ - Fix a one-in-2^32 bug in the hash handling code
 
 
 ## [1.2.0] 2020-06-18
 
 ### Added
  - Add ES Module interface and TS definitions from [@takase1121](https://github.com/takase1121)
+
 
 ## [1.1.1] 2020-06-08
 
@@ -28,10 +30,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added public lockWrite()
  - Added opt.lockWrite/opt.lockExclusive option for get(),set() and delete()
 
+
 ## [1.0.1] 2020-05-29
 
 ### Added
  - Added jsdoc
+
 
 ## [1.0.0] 2020-05-26
 
