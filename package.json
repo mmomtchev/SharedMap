@@ -9,7 +9,7 @@
     "test": "node --experimental-worker test",
     "c8": "node_modules/.bin/c8 node test",
     "lcov": "node_modules/.bin/c8 report --reporter=text-lcov > coverage/tests.lcov",
-    "codecov": "curl -s https://codecov.io/bash | env CODECOV_TOKEN='bd348e30-1f23-4e2e-8d31-684e83362e6c' bash",
+    "codecov": "curl -s https://codecov.io/bash | bash",
     "build:umd": "node_modules/.bin/rollup -i index.js -f umd -o index.umd.js --output.name=default",
     "build:es": "node_modules/.bin/rollup -i index.js -f es -o index.es.js",
     "build": "npm run build:umd && npm run build:es",
