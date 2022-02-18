@@ -96,8 +96,8 @@ export default class SharedMap {
      */
     constructor(maxSize, keySize, objSize) {
         maxSize = align32(maxSize);
-        keySize = align32(keySize);
-        objSize = align32(objSize);
+        keySize = align32(keySize + 1); //plus one to account for zero byte termination.
+        objSize = align32(objSize + 1);
 
         if (!(maxSize > 0 && keySize > 0 && objSize > 0))
             throw new RangeError('maxSize, keySize and objSize must be positive numbers');
@@ -449,10 +449,10 @@ export default class SharedMap {
             value = value.toString();
         if (typeof value !== 'string')
             throw new TypeError('SharedMap can contain only strings and numbers which will be converted to strings');
-        if (key.length > this.meta[META.keySize])
-            throw new RangeError(`SharedMap key ${key} does not fit in ${this.meta[META.keySize] * Uint16Array.BYTES_PER_ELEMENT} bytes, ${this.meta[META.keySize]} UTF-16 code points`);
-        if (value.length > this.meta[META.objSize])
-            throw new RangeError(`SharedMap value ${value} does not fit in ${this.meta[META.objSize] * Uint16Array.BYTES_PER_ELEMENT} bytes, ${this.meta[META.objSize]} UTF-16 code points`);
+        if (key.length > this.meta[META.keySize] - 1)
+            throw new RangeError(`SharedMap key ${key} does not fit in ${this.meta[META.keySize] * Uint16Array.BYTES_PER_ELEMENT} bytes, ${this.meta[META.keySize] - 1} UTF-16 code points`);
+        if (value.length > this.meta[META.objSize] - 1)
+            throw new RangeError(`SharedMap value ${value} does not fit in ${this.meta[META.objSize] * Uint16Array.BYTES_PER_ELEMENT} bytes, ${this.meta[META.objSize] - 1} UTF-16 code points`);
 
         const lockHeld = opt && (opt.lockWrite || opt.lockExclusive);
         this.stats.set++;
