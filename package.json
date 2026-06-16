@@ -40,7 +40,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^7.7.0",
-    "jsdoc": "^3.6.5",
+    "jsdoc": "^4.0.5",
     "rollup": "^4.59.0"
   }
 }
